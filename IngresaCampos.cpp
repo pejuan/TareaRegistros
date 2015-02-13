@@ -26,6 +26,7 @@ int main(int argc, char** argv){
 	vector<int> sizes;
 	int opcion;
 	int tamano;
+	int CantidadCampos;
 	string nombre;
 	int opcion2;
 	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
@@ -81,29 +82,23 @@ int main(int argc, char** argv){
 				break;
 			}
 		}
-	
-		ofstream fileCampos;
-		fileCampos.open("Metadata.txt");
-		for (int i = 0; i < nombrecampos.size(); i++){
-			fileCampos<<nombrecampos[i]<<" ";
-		}	
-		fileCampos.close();
-
-		ofstream fileTipoCampos;
-		fileTipoCampos.open("Metadata3.txt");
-		for (int i = 0; i < tipocampos.size(); i++){
-			fileTipoCampos<<tipocampos[i]<<" ";
-		}	
-		fileTipoCampos.close();
-
-		ofstream longitudCampos;
-		longitudCampos.open("Metadata2.txt");
-		for (int i = 0; i < sizes.size(); i++){
-			longitudCampos<<sizes[i]<<",";
-		}
-		longitudCampos.close();
-		cout<<"-------------------------------------------------"<<endl;
+		//////////////////////////////////////////////////////////////////
 		ofstream out("Registro.bin", ios::out|ios::binary);
+		CantidadCampos = nombrecampos.size(); 
+		out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+		for (int i = 0; i < nombrecampos.size(); i++){
+			out.write(reinterpret_cast<char*>(&nombrecampos[i]), sizeof(string)); //Guarda todos los nombres de los campos
+		}	
+
+		for (int i = 0; i < tipocampos.size(); i++){
+			out.write(reinterpret_cast<char*>(&tipocampos[i]), sizeof(string));
+		}	
+
+		for (int i = 0; i < sizes.size(); i++){
+			out.write(reinterpret_cast<char*>(&sizes[i]), sizeof(int));
+		}
+		cout<<"-------------------------------------------------"<<endl;
+		
 
 		while(true){
 			cout<<"Ingrese los datos:"<<endl;
@@ -148,41 +143,13 @@ int main(int argc, char** argv){
 			}
 		}
 	}else if(opcion2==2){
-		string metadata = "";
-		string metadata2 = "";
-		string metadata3 = "";
-		ifstream file("Metadata.txt");
-		getline(file,metadata);
-		file.close();
-		ifstream file2("Metadata2.txt");
-		getline(file2,metadata2);
-		file2.close();
-		ifstream file3("Metadata3.txt");
-		getline(file3,metadata3);
-		file3.close();
-		////////////////////////////
-		stringstream ss1(metadata);
-		string read;
-		while(ss1 >> read){
-			nombrecampos.push_back(read);		
-		}
-		////////////////////////////
-		stringstream ss2(metadata2);
-		int e;
-		while(ss2 >> e){
-			sizes.push_back(e);
-			if(ss2.peek() == ','){
-				ss2.ignore();
-			}
-		}
+		ifstream in("Registro.bin", ios::in|ios::binary);
+		char buf[sizeof(int)];
+		in.read(buf,sizeof(int));
+		charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));
+		CantidadCampos = primeraleida.num;
 		///////////////////////////
-		stringstream ss3(metadata3);
-		string read3;
-		while(ss3 >> read3){
-			tipocampos.push_back(read3);
-		}
-		///////////////////////////
-
 		int totalbuffer = 0;
 		vector<int> tamanosreales;
 		for (int i = 0; i < tipocampos.size(); i++){
@@ -210,7 +177,7 @@ int main(int argc, char** argv){
 			cout<<setw(10)<<nombrecampos[i];
 		}
 		cout<<endl<<"---------------------------------------------------------------------"<<endl;
-		ifstream in("Registro.bin", ios::in|ios::binary);
+		
 		char buffer[totalbuffer];
 		int progress = 0;
 		while(in.good()){ ///quitar el eof
@@ -267,7 +234,7 @@ int main(int argc, char** argv){
 	}else if(opcion2==3){
 
 	}else if(opcion2==4){
-		
+
 	}
 
 	return 0;
