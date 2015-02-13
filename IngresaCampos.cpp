@@ -149,6 +149,23 @@ int main(int argc, char** argv){
 		charint primeraleida;
 		memcpy(primeraleida.raw,buf,sizeof(int));
 		CantidadCampos = primeraleida.num;
+		char BufferNombres[CantidadCampos*sizeof(string)];
+		in.read(BufferNombres,CantidadCampos*sizeof(string));
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(nombrecampos[i],BufferNombres+sizeof(string),sizeof(string));
+		}
+		char BufferTipo[CantidadCampos*sizeof(string)];
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(tipocampos[i],BufferTipo+sizeof(string),sizeof(string));
+		}
+		char BufferSizes[CantidadCampos*sizeof(string)];
+		charint elSize;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferTipo+sizeof(string),sizeof(string));
+			sizes[i] = elSize.num;
+		}
+
+
 		///////////////////////////
 		int totalbuffer = 0;
 		vector<int> tamanosreales;
