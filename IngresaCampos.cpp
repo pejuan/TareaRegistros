@@ -28,7 +28,8 @@ int main(int argc, char** argv){
 	int tamano;
 	string nombre;
 	int opcion2;
-	cout<<"1)Ingresar"<<endl<<"2)Leer"<<endl<<"Ingrese el codigo de lo que desea hacer:";
+	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
+		<<"Ingrese el codigo de lo que desea hacer:";
 	cin>>opcion2;
 	if (opcion2==1){
 		while(true){
@@ -263,7 +264,10 @@ int main(int argc, char** argv){
 		}
 		in.close();
 
+	}else if(opcion2==3){
 
+	}else if(opcion2==4){
+		
 	}
 
 	return 0;
