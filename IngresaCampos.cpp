@@ -499,8 +499,16 @@ int main(int argc, char** argv){
 		char mark = '*';
 		er.write(reinterpret_cast<char*>(&mark),sizeof(char));
 		er.close();
+		//end if 4
+	}else if(opcion2==5){//buscar
 
-	}//end if 4
+
+
+	}else if(opcion2==6){//modificar
+
+
+
+	}
 
 	return 0;
 }
