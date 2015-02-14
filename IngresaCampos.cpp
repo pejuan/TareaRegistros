@@ -168,7 +168,6 @@ int main(int argc, char** argv){
 			cout<<setw(10)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
-			//nombrecampos[i] = eslabon; causaba segmentation fault
 		}
 
 
@@ -181,7 +180,6 @@ int main(int argc, char** argv){
 			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
 			tipocampos.push_back(CI.num);
 			progreso += sizeof(int);
-			//tipocampos[i] = CI.num;
 		}
 		/////////
 
@@ -190,12 +188,10 @@ int main(int argc, char** argv){
 		in.read(BufferSizes,CantidadCampos*sizeof(int));
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(elSize.raw,BufferTipo+progreso,sizeof(int));
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
 			sizes.push_back(elSize.num);
 			progreso += sizeof(int);
-			//sizes[i] = elSize.num;
 		}
-
 
 		///////////////////////////
 		int totalbuffer = 0;
