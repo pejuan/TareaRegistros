@@ -499,9 +499,141 @@ int main(int argc, char** argv){
 		char mark = '*';
 		er.write(reinterpret_cast<char*>(&mark),sizeof(char));
 		er.close();
+		cout<<"Borrado con exito!"<<endl;
 		//end if 4
 	}else if(opcion2==5){//buscar
 
+		int metodo;
+		ifstream in("Registro.bin", ios::in|ios::binary);
+		tipocampos.clear();
+		nombrecampos.clear();
+		sizes.clear();
+		char buf[sizeof(int)];
+		in.read(buf,sizeof(int));
+		charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));
+		CantidadCampos = primeraleida.num;
+		char BufferNombres[CantidadCampos*sizeof(char)*20];
+		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		int progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			char eslabon[20];
+			memcpy(eslabon,BufferNombres+progreso,19);
+			eslabon[19]='\0';
+			progreso += sizeof(char)*20;
+			nombrecampos.push_back(eslabon);
+			espejoCampos.push_back(eslabon);
+		}	
+		char BufferTipo[CantidadCampos*sizeof(int)];
+		in.read(BufferTipo,CantidadCampos*sizeof(int));
+		charint CI;
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+		}
+		/////////
+		char BufferSizes[CantidadCampos*sizeof(int)];
+		charint elSize;
+		in.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+		}
+
+		///////////////////////////
+		int totalbuffer = 0;
+		vector<int> tamanosreales;
+		for (int i = 0; i < tipocampos.size(); i++){
+			if (tipocampos[i]==1){
+				tamanosreales.push_back(sizeof(char)*sizes[i]);
+				totalbuffer += sizeof(char)*sizes[i];	
+			}else if(tipocampos[i]==2){
+				tamanosreales.push_back(sizeof(char));
+				totalbuffer += sizeof(char);
+			}else if(tipocampos[i]==3){
+				tamanosreales.push_back(sizeof(int));
+				totalbuffer += sizeof(int);
+			}else if(tipocampos[i]==5){
+				tamanosreales.push_back(sizeof(float));
+				totalbuffer += sizeof(float);
+			}else if(tipocampos[i]==4){
+				tamanosreales.push_back(sizeof(double));
+				totalbuffer += sizeof(double);
+			}
+		}
+		in.close();
+		cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por Indice"<<endl<<"2)Por Campo"<<endl
+			<<"Ingrese codigo de opcion:";
+		cin>>metodo;
+		if (metodo==1){
+			ifstream busq("Registro.bin",ios::in|ios::binary);
+			cout<<"Ingrese el indice del registro que quiere desplegar:";
+			int index;
+			cin>>index;
+			int offset = 0;
+			offset += sizeof(int);
+			offset += CantidadCampos*sizeof(char)*20;
+			offset += CantidadCampos*sizeof(int);
+			offset += CantidadCampos*sizeof(int);
+			offset += totalbuffer*index;
+			char bufferBusqueda[offset];
+			busq.read(bufferBusqueda,offset);
+			char buffer[totalbuffer];
+			busq.read(buffer,totalbuffer);
+			for (int i = 0; i < tipocampos.size(); ++i){
+				cout<<setw(15)<<espejoCampos[i];
+			}
+			cout<<endl<<"-----------------------------------------------------------------------"<<endl;
+			int progress = 0;
+			for (int i = 0; i < tipocampos.size(); i++){
+					if (tipocampos[i]==1){
+						char chain[sizes[i]];
+						memcpy(chain, buffer+progress, sizes[i]-1);
+						chain[sizes[i]-1] = '\0';
+						progress += sizes[i];
+						cout<<setw(15)<<chain;
+					
+					}else if(tipocampos[i]==2){
+						char car[2];
+						memcpy(car,buffer+progress,sizeof(char));
+						progress += sizeof(char);
+						car[1] = '\0';
+						cout<<setw(15)<<car;
+				
+					}else if(tipocampos[i]==3){
+						charint elEntero;
+						int entero;
+						memcpy(elEntero.raw,buffer+progress,sizeof(int));
+						progress += sizeof(int);
+						entero = elEntero.num;
+						cout<<setw(15)<<entero;
+
+					}else if(tipocampos[i]==5){
+						charfloat elFloat;
+						float elFlotante;
+						memcpy(elFloat.raw,buffer+progress,sizeof(float));
+						progress += sizeof(float);
+						elFlotante = elFloat.num;
+						cout<<setw(15)<<elFlotante;
+				
+					}else if(tipocampos[i]==4){
+						chardouble elDouble;
+						double elDoble;
+						memcpy(elDouble.raw,buffer+progress,sizeof(double));
+						progress += sizeof(double);
+						elDoble = elDouble.num;
+						cout<<setw(15)<<elDoble;
+					}
+			}
+			cout<<endl;
+			busq.close();
+		}else if(metodo==2){
+
+		}
 
 
 	}else if(opcion2==6){//modificar
