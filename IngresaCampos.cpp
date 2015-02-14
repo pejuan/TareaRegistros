@@ -30,8 +30,8 @@ int main(int argc, char** argv){
 	int CantidadCampos;
 	char nombre[20];
 	int opcion2;
-	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
-		<<"Ingrese el codigo de lo que desea hacer:";
+	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
+		<<"5)Buscar registro"<<endl<<"6)Modificar"<<"Ingrese el codigo de lo que desea hacer:";
 	cin>>opcion2;
 	if (opcion2==1){
 		cout<<"Ingrese cuantos campos tendra su estructura: ";
@@ -272,10 +272,98 @@ int main(int argc, char** argv){
 		}
 		in.close();
 
-	}else if(opcion2==3){
+	}else if(opcion2==3){//Append
+
+		ifstream in("Registro.bin", ios::in|ios::binary);
+		tipocampos.clear();
+		nombrecampos.clear();
+		sizes.clear();
+		espejoCampos.clear();
+		char buf[sizeof(int)];
+		in.read(buf,sizeof(int));
+		charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));
+		CantidadCampos = primeraleida.num;
+		char BufferNombres[CantidadCampos*sizeof(char)*20];
+		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		int progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			char eslabon[20];
+			memcpy(eslabon,BufferNombres+progreso,19);
+			eslabon[19]='\0';
+			progreso += sizeof(char)*20;
+			nombrecampos.push_back(eslabon);
+			espejoCampos.push_back(eslabon);
+		}	
+		char BufferTipo[CantidadCampos*sizeof(int)];
+		in.read(BufferTipo,CantidadCampos*sizeof(int));
+		charint CI;
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+		}
+		/////////
+		char BufferSizes[CantidadCampos*sizeof(int)];
+		charint elSize;
+		in.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+		}
+		in.close();	
+		ofstream append("Registro.bin", ios::out|ios::in|ios::app|ios::binary);
+		cout<<"-------------------------------------------------"<<endl;
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		while(true){
+			cout<<"Ingrese los datos:"<<endl;
+			for (int i = 0; i < tipocampos.size(); ++i){
+				if(tipocampos[i]==1){
+					cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+					char cadena[sizes[i]];
+					cin>>cadena;
+					append.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+				}else if(tipocampos[i]==2){
+					cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+					char caracter;
+					cin>>caracter;
+					append.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+				}else if(tipocampos[i]==3){
+					cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+					int entero;
+					cin>>entero;
+					append.write(reinterpret_cast<char*>(&entero), sizeof(int));
+				}else if(tipocampos[i]==5){
+					cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+					float flotante;
+					cin>>flotante;
+					append.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+				}else{
+					cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+					double doble;
+					cin>>doble;
+					append.write(reinterpret_cast<char*>(&doble), sizeof(double));
+				}
+			}
 
 
-	}else if(opcion2==4){
+			cout<<"Desea agregar otro registro? [S/N]:";
+			char resp2;
+			cin>>resp2;
+			if (resp2=='s' || resp2=='S'){
+			
+			}else{
+				append.close();
+				break;
+			}
+		}
+
+
+	}else if(opcion2==4){//Borrar
 
 		ifstream in("Registro.bin", ios::in|ios::binary);
 		tipocampos.clear();
