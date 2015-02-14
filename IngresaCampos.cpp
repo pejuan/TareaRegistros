@@ -633,6 +633,169 @@ int main(int argc, char** argv){
 			busq.close();
 		}else if(metodo==2){
 
+			int fieldIndex;
+			for (int i = 0; i < espejoCampos.size(); ++i){
+				cout<<i<<")"<<espejoCampos[i]<<endl;
+			}
+			cout<<"Ingrese el codigo del campo por el cual buscara:";
+			cin>>fieldIndex;
+			char llaveString[sizes[fieldIndex]];
+			char llaveChar;
+			int llaveInt;
+			double llaveDouble;
+			float llaveFloat;
+			cout<<"Ingrese el valor buscado:";
+			int tamanoDato;
+			if(tipocampos[fieldIndex]==1){//string
+				tamanoDato = sizeof(char)*sizes[fieldIndex];
+				cin>>llaveString;
+			}else if(tipocampos[fieldIndex]==2){//char
+				cin>>llaveChar;
+				tamanoDato = sizeof(char);
+			}else if(tipocampos[fieldIndex]==3){//int
+				cin>>llaveInt;
+				tamanoDato = sizeof(int);
+			}else if(tipocampos[fieldIndex]==4){//double
+				cin>>llaveDouble;
+				tamanoDato = sizeof(double);
+			}else{//float
+				cin>>llaveFloat;
+				tamanoDato = sizeof(float);
+			}
+			int offset = 0;
+			offset += sizeof(int);
+			offset += CantidadCampos*sizeof(char)*20;
+			offset += CantidadCampos*sizeof(int);
+			offset += CantidadCampos*sizeof(int);
+			char garbage[offset];
+			ifstream busq("Registro.bin",ios::in|ios::binary);
+			busq.read(garbage,offset);
+
+			char lectura[totalbuffer];
+			int minioffset = 0;
+			for (int i = 0; i < fieldIndex; ++i){
+				if(tipocampos[i]==1){
+					minioffset += sizes[i]*sizeof(char);
+
+				}else if(tipocampos[i]==2){
+					minioffset += sizeof(char);
+
+				}else if(tipocampos[i]==3){
+					minioffset += sizeof(int);
+
+				}else if(tipocampos[i]==4){//double
+					minioffset += sizeof(double);
+
+				}else if(tipocampos[i]==5){//float
+					minioffset += sizeof(float);
+				}
+			}
+			int contador = 0;
+			bool found = false;
+			while(busq.good()){
+
+				busq.read(lectura,totalbuffer);
+				if(in.eof()){
+					break;
+				}
+				char verificacion[2];
+				memcpy(verificacion,lectura,sizeof(char));
+				verificacion[1] = '\0';
+				if (verificacion[0]=='*'){
+				
+				}else{
+					if(tipocampos[fieldIndex]==1){
+						char datiles[sizes[fieldIndex]];
+						memcpy(datiles, lectura+minioffset,tamanoDato-1);
+						datiles[tamanoDato-1] = '\0';
+						if (datiles == llaveString){
+							found = true;
+						}
+
+					}else if(tipocampos[fieldIndex]==2){
+						char datiles[2];
+						memcpy(datiles,lectura+minioffset,sizeof(char));
+						datiles[1]='\0';
+						if (datiles[0] == llaveChar){
+							found = true;
+						}
+
+					}else if(tipocampos[fieldIndex]==3){
+						charint datiles;
+						memcpy(datiles.raw,lectura+minioffset,sizeof(int));
+						if (datiles.num == llaveInt){
+							found = true;
+						}
+					}else if(tipocampos[fieldIndex]==4){//double
+						chardouble datiles;
+						memcpy(datiles.raw,lectura+minioffset,sizeof(double));
+						if (datiles.num == llaveDouble){
+							found = true;
+						}
+
+					}else if(tipocampos[fieldIndex]==5){//float
+						charfloat datiles;
+						memcpy(datiles.raw,lectura+minioffset,sizeof(float));
+						if (datiles.num == llaveFloat){
+							found = true;
+						}
+					}					
+				}//end else
+
+				if(found){
+					for (int i = 0; i < espejoCampos.size(); ++i){
+						cout<<setw(15)<<espejoCampos[i];
+					}
+					cout<<endl<<"---------------------------------------------------------------------"<<endl;
+					int progress = 0;
+					for (int i = 0; i < tipocampos.size(); i++){
+						if (tipocampos[i]==1){
+							char chain[sizes[i]];
+							memcpy(chain, lectura+progress, sizes[i]-1);
+							chain[sizes[i]-1] = '\0';
+							progress += sizes[i];
+							cout<<setw(15)<<chain;
+					
+						}else if(tipocampos[i]==2){
+							char car[2];
+							memcpy(car,lectura+progress,sizeof(char));
+							progress += sizeof(char);
+							car[1] = '\0';
+							cout<<setw(15)<<car;
+				
+						}else if(tipocampos[i]==3){
+							charint elEntero;
+							int entero;
+							memcpy(elEntero.raw,lectura+progress,sizeof(int));
+							progress += sizeof(int);
+							entero = elEntero.num;
+							cout<<setw(15)<<entero;
+
+						}else if(tipocampos[i]==5){
+							charfloat elFloat;
+							float elFlotante;
+							memcpy(elFloat.raw,lectura+progress,sizeof(float));
+							progress += sizeof(float);
+							elFlotante = elFloat.num;
+							cout<<setw(15)<<elFlotante;
+				
+						}else if(tipocampos[i]==4){
+							chardouble elDouble;
+							double elDoble;
+							memcpy(elDouble.raw,lectura+progress,sizeof(double));
+							progress += sizeof(double);
+							elDoble = elDouble.num;
+							cout<<setw(15)<<elDoble;
+						}
+
+					}
+					cout<<endl;
+					break;
+
+				}
+				contador++;
+			}
+			busq.close();
 		}
 
 
