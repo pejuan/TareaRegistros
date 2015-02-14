@@ -151,15 +151,16 @@ int main(int argc, char** argv){
 		}
 	}else if(opcion2==2){
 		ifstream in("Registro.bin", ios::in|ios::binary);
+		tipocampos.clear();
+		nombrecampos.clear();
+		sizes.clear();
 		char buf[sizeof(int)];
 		in.read(buf,sizeof(int));
 		charint primeraleida;
 		memcpy(primeraleida.raw,buf,sizeof(int));
 		CantidadCampos = primeraleida.num;
-		cout<<CantidadCampos<<endl;
 		char BufferNombres[CantidadCampos*sizeof(char)*20];
 		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
-
 		int progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
 			char eslabon[20];
@@ -168,10 +169,7 @@ int main(int argc, char** argv){
 			cout<<setw(10)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
-		}
-
-
-		
+		}	
 		char BufferTipo[CantidadCampos*sizeof(int)];
 		in.read(BufferTipo,CantidadCampos*sizeof(int));
 		charint CI;
@@ -182,7 +180,6 @@ int main(int argc, char** argv){
 			progreso += sizeof(int);
 		}
 		/////////
-
 		char BufferSizes[CantidadCampos*sizeof(int)];
 		charint elSize;
 		in.read(BufferSizes,CantidadCampos*sizeof(int));
@@ -214,13 +211,7 @@ int main(int argc, char** argv){
 				totalbuffer += sizeof(double);
 			}
 		}
-		/////////////////////////////////////////////////////////////
-		/*for (int i = 0; i < nombrecampos.size(); i++)
-		{
-			cout<<setw(10)<<nombrecampos[i];
-		}*/
-		cout<<endl<<"---------------------------------------------------------------------"<<endl;
-		
+		cout<<endl<<"---------------------------------------------------------------------"<<endl;		
 		char buffer[totalbuffer];
 		int progress = 0;
 		while(in.good()){ ///quitar el eof
