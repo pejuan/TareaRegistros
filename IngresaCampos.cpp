@@ -387,6 +387,14 @@ int main(int argc, char** argv){
 		}
 		in.close();
 		int indiceBorrado;
+		cout<<"Ingrese el indice de el registro que desea eliminar:";
+		cin>>indiceBorrado;
+
+		ifstream er("Registro.bin", ios::in|ios::binary);
+
+		int offset = 0;
+		offset += sizeof(int);
+		er.close();
 
 	}//end if 4
 
