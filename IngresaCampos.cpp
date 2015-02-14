@@ -221,51 +221,59 @@ int main(int argc, char** argv){
 				break;
 			}
 			progress = 0;
-			for (int i = 0; i < tipocampos.size(); i++){
-				if (tipocampos[i]==1){
-					char chain[sizes[i]];
-					memcpy(chain, buffer+progress, sizes[i]-1);
-					chain[sizes[i]-1] = '\0';
-					progress += sizes[i];
-					cout<<setw(10)<<chain;
+			char verificacion[2];
+			memcpy(verificacion,buffer,sizeof(char));
+			verificacion[1] = '\0';
+			if (verificacion[0]=='*'){
+				
+			}else{
+				for (int i = 0; i < tipocampos.size(); i++){
+					if (tipocampos[i]==1){
+						char chain[sizes[i]];
+						memcpy(chain, buffer+progress, sizes[i]-1);
+						chain[sizes[i]-1] = '\0';
+						progress += sizes[i];
+						cout<<setw(10)<<chain;
 					
-				}else if(tipocampos[i]==2){
-					char car[2];
-					memcpy(car,buffer+progress,sizeof(char));
-					progress += sizeof(char);
-					car[1] = '\0';
-					cout<<setw(10)<<car;
+					}else if(tipocampos[i]==2){
+						char car[2];
+						memcpy(car,buffer+progress,sizeof(char));
+						progress += sizeof(char);
+						car[1] = '\0';
+						cout<<setw(10)<<car;
 				
-				}else if(tipocampos[i]==3){
-					charint elEntero;
-					int entero;
-					memcpy(elEntero.raw,buffer+progress,sizeof(int));
-					progress += sizeof(int);
-					entero = elEntero.num;
-					cout<<setw(10)<<entero;
+					}else if(tipocampos[i]==3){
+						charint elEntero;
+						int entero;
+						memcpy(elEntero.raw,buffer+progress,sizeof(int));
+						progress += sizeof(int);
+						entero = elEntero.num;
+						cout<<setw(10)<<entero;
 
-				}else if(tipocampos[i]==5){
-					charfloat elFloat;
-					float elFlotante;
-					memcpy(elFloat.raw,buffer+progress,sizeof(float));
-					progress += sizeof(float);
-					elFlotante = elFloat.num;
-					cout<<setw(10)<<elFlotante;
+					}else if(tipocampos[i]==5){
+						charfloat elFloat;
+						float elFlotante;
+						memcpy(elFloat.raw,buffer+progress,sizeof(float));
+						progress += sizeof(float);
+						elFlotante = elFloat.num;
+						cout<<setw(10)<<elFlotante;
 				
-				}else if(tipocampos[i]==4){
-					chardouble elDouble;
-					double elDoble;
-					memcpy(elDouble.raw,buffer+progress,sizeof(double));
-					progress += sizeof(double);
-					elDoble = elDouble.num;
-					cout<<setw(10)<<elDoble;
+					}else if(tipocampos[i]==4){
+						chardouble elDouble;
+						double elDoble;
+						memcpy(elDouble.raw,buffer+progress,sizeof(double));
+						progress += sizeof(double);
+						elDoble = elDouble.num;
+						cout<<setw(10)<<elDoble;
+					}
 				}
+				cout<<endl;
 			}
-			cout<<endl;
 		}
 		in.close();
 
 	}else if(opcion2==3){
+
 
 	}else if(opcion2==4){
 
