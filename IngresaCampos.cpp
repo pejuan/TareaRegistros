@@ -31,7 +31,7 @@ int main(int argc, char** argv){
 	char nombre[20];
 	int opcion2;
 	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
-		<<"5)Buscar registro"<<endl<<"6)Modificar"<<"Ingrese el codigo de lo que desea hacer:";
+		<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 	cin>>opcion2;
 	if (opcion2==1){
 		cout<<"Ingrese cuantos campos tendra su estructura: ";
@@ -166,7 +166,7 @@ int main(int argc, char** argv){
 			char eslabon[20];
 			memcpy(eslabon,BufferNombres+progreso,19);
 			eslabon[19]='\0';
-			cout<<setw(10)<<eslabon;
+			cout<<setw(15)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
 		}	
@@ -233,14 +233,14 @@ int main(int argc, char** argv){
 						memcpy(chain, buffer+progress, sizes[i]-1);
 						chain[sizes[i]-1] = '\0';
 						progress += sizes[i];
-						cout<<setw(10)<<chain;
+						cout<<setw(15)<<chain;
 					
 					}else if(tipocampos[i]==2){
 						char car[2];
 						memcpy(car,buffer+progress,sizeof(char));
 						progress += sizeof(char);
 						car[1] = '\0';
-						cout<<setw(10)<<car;
+						cout<<setw(15)<<car;
 				
 					}else if(tipocampos[i]==3){
 						charint elEntero;
@@ -248,7 +248,7 @@ int main(int argc, char** argv){
 						memcpy(elEntero.raw,buffer+progress,sizeof(int));
 						progress += sizeof(int);
 						entero = elEntero.num;
-						cout<<setw(10)<<entero;
+						cout<<setw(15)<<entero;
 
 					}else if(tipocampos[i]==5){
 						charfloat elFloat;
@@ -256,7 +256,7 @@ int main(int argc, char** argv){
 						memcpy(elFloat.raw,buffer+progress,sizeof(float));
 						progress += sizeof(float);
 						elFlotante = elFloat.num;
-						cout<<setw(10)<<elFlotante;
+						cout<<setw(15)<<elFlotante;
 				
 					}else if(tipocampos[i]==4){
 						chardouble elDouble;
@@ -264,7 +264,7 @@ int main(int argc, char** argv){
 						memcpy(elDouble.raw,buffer+progress,sizeof(double));
 						progress += sizeof(double);
 						elDoble = elDouble.num;
-						cout<<setw(10)<<elDoble;
+						cout<<setw(15)<<elDoble;
 					}
 				}
 				cout<<endl;
@@ -382,7 +382,7 @@ int main(int argc, char** argv){
 			char eslabon[20];
 			memcpy(eslabon,BufferNombres+progreso,19);
 			eslabon[19]='\0';
-			cout<<setw(10)<<eslabon;
+			cout<<setw(15)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
 		}	
@@ -445,14 +445,14 @@ int main(int argc, char** argv){
 					memcpy(chain, buffer+progress, sizes[i]-1);
 					chain[sizes[i]-1] = '\0';
 					progress += sizes[i];
-					cout<<setw(10)<<chain;
+					cout<<setw(15)<<chain;
 					
 				}else if(tipocampos[i]==2){
 					char car[2];
 					memcpy(car,buffer+progress,sizeof(char));
 					progress += sizeof(char);
 					car[1] = '\0';
-					cout<<setw(10)<<car;
+					cout<<setw(15)<<car;
 				
 				}else if(tipocampos[i]==3){
 					charint elEntero;
@@ -460,7 +460,7 @@ int main(int argc, char** argv){
 					memcpy(elEntero.raw,buffer+progress,sizeof(int));
 					progress += sizeof(int);
 					entero = elEntero.num;
-					cout<<setw(10)<<entero;
+					cout<<setw(15)<<entero;
 
 				}else if(tipocampos[i]==5){
 					charfloat elFloat;
@@ -468,7 +468,7 @@ int main(int argc, char** argv){
 					memcpy(elFloat.raw,buffer+progress,sizeof(float));
 					progress += sizeof(float);
 					elFlotante = elFloat.num;
-					cout<<setw(10)<<elFlotante;
+					cout<<setw(15)<<elFlotante;
 				
 				}else if(tipocampos[i]==4){
 					chardouble elDouble;
@@ -476,7 +476,7 @@ int main(int argc, char** argv){
 					memcpy(elDouble.raw,buffer+progress,sizeof(double));
 					progress += sizeof(double);
 					elDoble = elDouble.num;
-					cout<<setw(10)<<elDoble;
+					cout<<setw(15)<<elDoble;
 				}
 			}
 			cout<<endl;
@@ -506,7 +506,170 @@ int main(int argc, char** argv){
 
 	}else if(opcion2==6){//modificar
 
+		ifstream in("Registro.bin", ios::in|ios::binary);
+		tipocampos.clear();
+		nombrecampos.clear();
+		sizes.clear();
+		char buf[sizeof(int)];
+		in.read(buf,sizeof(int));
+		charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));
+		CantidadCampos = primeraleida.num;
+		char BufferNombres[CantidadCampos*sizeof(char)*20];
+		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		int progreso = 0;
+		cout<<setw(10)<<"Indice";
+		for (int i = 0; i < CantidadCampos; ++i){
+			char eslabon[20];
+			memcpy(eslabon,BufferNombres+progreso,19);
+			eslabon[19]='\0';
+			cout<<setw(15)<<eslabon;
+			progreso += sizeof(char)*20;
+			nombrecampos.push_back(eslabon);
+			espejoCampos.push_back(eslabon);
+		}	
+		char BufferTipo[CantidadCampos*sizeof(int)];
+		in.read(BufferTipo,CantidadCampos*sizeof(int));
+		charint CI;
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+		}
+		/////////
+		char BufferSizes[CantidadCampos*sizeof(int)];
+		charint elSize;
+		in.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+		}
 
+		///////////////////////////
+		int totalbuffer = 0;
+		vector<int> tamanosreales;
+		for (int i = 0; i < tipocampos.size(); i++){
+			if (tipocampos[i]==1){
+				tamanosreales.push_back(sizeof(char)*sizes[i]);
+				totalbuffer += sizeof(char)*sizes[i];	
+			}else if(tipocampos[i]==2){
+				tamanosreales.push_back(sizeof(char));
+				totalbuffer += sizeof(char);
+			}else if(tipocampos[i]==3){
+				tamanosreales.push_back(sizeof(int));
+				totalbuffer += sizeof(int);
+			}else if(tipocampos[i]==5){
+				tamanosreales.push_back(sizeof(float));
+				totalbuffer += sizeof(float);
+			}else if(tipocampos[i]==4){
+				tamanosreales.push_back(sizeof(double));
+				totalbuffer += sizeof(double);
+			}
+		}
+		cout<<endl<<"---------------------------------------------------------------------"<<endl;		
+		char buffer[totalbuffer];
+		int progress = 0;
+		int correlativo = -1;
+		while(in.good()){ ///quitar el eof
+			correlativo++;
+			in.read(buffer,totalbuffer);
+			if(in.eof()){
+				break;
+			}
+			progress = 0;
+			cout<<setw(15)<<correlativo;
+			for (int i = 0; i < tipocampos.size(); i++){
+				if (tipocampos[i]==1){
+					char chain[sizes[i]];
+					memcpy(chain, buffer+progress, sizes[i]-1);
+					chain[sizes[i]-1] = '\0';
+					progress += sizes[i];
+					cout<<setw(15)<<chain;
+					
+				}else if(tipocampos[i]==2){
+					char car[2];
+					memcpy(car,buffer+progress,sizeof(char));
+					progress += sizeof(char);
+					car[1] = '\0';
+					cout<<setw(15)<<car;
+				
+				}else if(tipocampos[i]==3){
+					charint elEntero;
+					int entero;
+					memcpy(elEntero.raw,buffer+progress,sizeof(int));
+					progress += sizeof(int);
+					entero = elEntero.num;
+					cout<<setw(15)<<entero;
+
+				}else if(tipocampos[i]==5){
+					charfloat elFloat;
+					float elFlotante;
+					memcpy(elFloat.raw,buffer+progress,sizeof(float));
+					progress += sizeof(float);
+					elFlotante = elFloat.num;
+					cout<<setw(15)<<elFlotante;
+				
+				}else if(tipocampos[i]==4){
+					chardouble elDouble;
+					double elDoble;
+					memcpy(elDouble.raw,buffer+progress,sizeof(double));
+					progress += sizeof(double);
+					elDoble = elDouble.num;
+					cout<<setw(15)<<elDoble;
+				}
+			}
+			cout<<endl;
+		}
+		in.close();
+		int indiceModificado;
+		cout<<"Ingrese el indice de el registro que desea modificar:";
+		cin>>indiceModificado;
+		fstream mod("Registro.bin", ios::out|ios::in|ios::binary);
+
+		int offset = 0;
+		offset += sizeof(int);
+		offset += CantidadCampos*sizeof(char)*20;
+		offset += CantidadCampos*sizeof(int);
+		offset += CantidadCampos*sizeof(int);
+		offset += totalbuffer*indiceModificado;
+		char buffMod[offset];
+		mod.read(buffMod,offset);
+
+		cout<<"Ingrese los datos:"<<endl;
+			for (int i = 0; i < tipocampos.size(); ++i){
+				if(tipocampos[i]==1){
+					cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+					char cadena[sizes[i]];
+					cin>>cadena;
+					mod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+				}else if(tipocampos[i]==2){
+					cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+					char caracter;
+					cin>>caracter;
+					mod.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+				}else if(tipocampos[i]==3){
+					cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+					int entero;
+					cin>>entero;
+					mod.write(reinterpret_cast<char*>(&entero), sizeof(int));
+				}else if(tipocampos[i]==5){
+					cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+					float flotante;
+					cin>>flotante;
+					mod.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+				}else{
+					cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+					double doble;
+					cin>>doble;
+					mod.write(reinterpret_cast<char*>(&doble), sizeof(double));
+				}
+			}
+
+		mod.close();
+		cout<<"Modificado con exito!"<<endl;
 
 	}
 
