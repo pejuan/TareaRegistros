@@ -21,77 +21,84 @@ union chardouble{
 };
 
 int main(int argc, char** argv){
-	vector<string> tipocampos;
-	vector<string> nombrecampos;
+	vector<int> tipocampos;
+	vector<char*> nombrecampos;
+	vector<string> espejoCampos;
 	vector<int> sizes;
 	int opcion;
 	int tamano;
 	int CantidadCampos;
-	string nombre;
+	char nombre[20];
 	int opcion2;
 	cout<<"1)Ingresar nuevo"<<endl<<"2)Leer"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
 		<<"Ingrese el codigo de lo que desea hacer:";
 	cin>>opcion2;
 	if (opcion2==1){
+		cout<<"Ingrese cuantos campos tendra su estructura: ";
+		cin>>CantidadCampos;
+		ofstream out("Registro.bin", ios::out|ios::binary);
+		out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+		int contador = 0;
 		while(true){
 			cout<<endl
 				<<"1)String"<<endl<<"2)Char"<<endl<<"3)Integer"<<endl<<"4)Double"<<endl<<"5)Float"<<endl
 				<<"Ingrese que tipo de dato quiere ingresar en el campo:";
 			cin>>opcion;
 			if (opcion==1){
-				tipocampos.push_back("String");
+				tipocampos.push_back(1);
 				cout<<"Ingrese nombre del campo:";
 				cin>>nombre;
 				nombrecampos.push_back(nombre);
+				espejoCampos.push_back(nombre);
 				cout<<"Ingrese el tamaño del string:";
 				cin>>tamano;
 				sizes.push_back(tamano);
+				out.write(reinterpret_cast<char*>(&nombre), sizeof(char)*20);
 			}else if(opcion==2){
-				tipocampos.push_back("Char");
+				tipocampos.push_back(2);
 				cout<<"Ingrese nombre del campo:";
 				cin>>nombre;
 				nombrecampos.push_back(nombre);
+				espejoCampos.push_back(nombre);
 				sizes.push_back(1);
+				out.write(reinterpret_cast<char*>(&nombre), sizeof(char)*20);
 			}else if(opcion==3){
-				tipocampos.push_back("Integer");
+				tipocampos.push_back(3);
 				cout<<"Ingrese nombre del campo:";
 				cin>>nombre;
 				nombrecampos.push_back(nombre);
+				espejoCampos.push_back(nombre);
 				sizes.push_back(0);
+				out.write(reinterpret_cast<char*>(&nombre), sizeof(char)*20);
 			}else if(opcion==4){
-				tipocampos.push_back("Double");
+				tipocampos.push_back(4);
 				cout<<"Ingrese nombre del campo:";
 				cin>>nombre;
 				nombrecampos.push_back(nombre);
+				espejoCampos.push_back(nombre);
 				sizes.push_back(0);
+				out.write(reinterpret_cast<char*>(&nombre), sizeof(char)*20);
 			}else if(opcion==5){
-				tipocampos.push_back("Float");
+				tipocampos.push_back(5);
 				cout<<"Ingrese nombre del campo:";
 				cin>>nombre;
 				nombrecampos.push_back(nombre);
+				espejoCampos.push_back(nombre);
 				sizes.push_back(0);
+				out.write(reinterpret_cast<char*>(&nombre), sizeof(char)*20);
 			}else{
 				cout<<"Campo no es válido."<<endl;
 			}
-			cout<<"Desea continuar agregando campos? [S/N]: ";
-			char resp;
-			cin>>resp;
-			if (resp=='S' || resp=='s'){
-			
-			}else{
+
+			contador++;
+			if (contador==CantidadCampos){
 				break;
 			}
 		}
-		//////////////////////////////////////////////////////////////////
-		ofstream out("Registro.bin", ios::out|ios::binary);
-		CantidadCampos = nombrecampos.size(); 
-		out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
-		for (int i = 0; i < nombrecampos.size(); i++){
-			out.write(reinterpret_cast<char*>(&nombrecampos[i]), sizeof(string)); //Guarda todos los nombres de los campos
-		}	
+		//////////////////////////////////////////////////////////////////	
 
 		for (int i = 0; i < tipocampos.size(); i++){
-			out.write(reinterpret_cast<char*>(&tipocampos[i]), sizeof(string));
+			out.write(reinterpret_cast<char*>(&tipocampos[i]), sizeof(int));
 		}	
 
 		for (int i = 0; i < sizes.size(); i++){
@@ -103,28 +110,28 @@ int main(int argc, char** argv){
 		while(true){
 			cout<<"Ingrese los datos:"<<endl;
 			for (int i = 0; i < tipocampos.size(); ++i){
-				if(tipocampos[i]=="String"){
-					cout<<"Ingrese la cadena perteneciente al campo "<<nombrecampos[i]<<endl;
+				if(tipocampos[i]==1){
+					cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
 					char cadena[sizes[i]];
 					cin>>cadena;
 					out.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
-				}else if(tipocampos[i]=="Char"){
-					cout<<"Ingrese el caracter perteneciente al campo "<<nombrecampos[i]<<endl;
+				}else if(tipocampos[i]==2){
+					cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
 					char caracter;
 					cin>>caracter;
 					out.write(reinterpret_cast<char*>(&caracter), sizeof(char));
-				}else if(tipocampos[i]=="Integer"){
-					cout<<"Ingrese el entero perteneciente al campo "<<nombrecampos[i]<<endl;
+				}else if(tipocampos[i]==3){
+					cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
 					int entero;
 					cin>>entero;
 					out.write(reinterpret_cast<char*>(&entero), sizeof(int));
-				}else if(tipocampos[i]=="Float"){
-					cout<<"Ingrese el float perteneciente al campo "<<nombrecampos[i]<<endl;
+				}else if(tipocampos[i]==5){
+					cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
 					float flotante;
 					cin>>flotante;
 					out.write(reinterpret_cast<char*>(&flotante), sizeof(float));
 				}else{
-					cout<<"Ingrese el double perteneciente al campo "<<nombrecampos[i]<<endl;
+					cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
 					double doble;
 					cin>>doble;
 					out.write(reinterpret_cast<char*>(&doble), sizeof(double));
@@ -149,19 +156,36 @@ int main(int argc, char** argv){
 		charint primeraleida;
 		memcpy(primeraleida.raw,buf,sizeof(int));
 		CantidadCampos = primeraleida.num;
-		char BufferNombres[CantidadCampos*sizeof(string)];
-		in.read(BufferNombres,CantidadCampos*sizeof(string));
+		cout<<CantidadCampos<<endl;
+		char BufferNombres[CantidadCampos*sizeof(char)*20];
+		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		cout<<"Antes de leer los campos"<<endl;
+		int progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(nombrecampos[i],BufferNombres+sizeof(string),sizeof(string));
+			char eslabon[20];
+			memcpy(eslabon,BufferNombres+progreso,19);
+			eslabon[19]='\0';
+			cout<<setw(10)<<eslabon;
+			progreso += sizeof(char)*20;
+			//nombrecampos[i] = eslabon;
 		}
-		char BufferTipo[CantidadCampos*sizeof(string)];
+
+		cout<<endl<<"Despues de leer los campos"<<endl;
+		/*
+		char BufferTipo[CantidadCampos*sizeof(int)];
+		in.read(BufferTipo,CantidadCampos*sizeof(int));
+		charint CI;
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(tipocampos[i],BufferTipo+sizeof(string),sizeof(string));
+			memcpy(CI.raw,BufferTipo+sizeof(int),sizeof(int));
+			tipocampos[i] = CI.num;
 		}
-		char BufferSizes[CantidadCampos*sizeof(string)];
+		/////////
+
+		char BufferSizes[CantidadCampos*sizeof(int)];
 		charint elSize;
+		in.read(BufferSizes,CantidadCampos*sizeof(int));
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(elSize.raw,BufferTipo+sizeof(string),sizeof(string));
+			memcpy(elSize.raw,BufferTipo+sizeof(int),sizeof(int));
 			sizes[i] = elSize.num;
 		}
 
@@ -170,19 +194,19 @@ int main(int argc, char** argv){
 		int totalbuffer = 0;
 		vector<int> tamanosreales;
 		for (int i = 0; i < tipocampos.size(); i++){
-			if (tipocampos[i]=="String"){
+			if (tipocampos[i]==1){
 				tamanosreales.push_back(sizeof(char)*sizes[i]);
 				totalbuffer += sizeof(char)*sizes[i];	
-			}else if(tipocampos[i]=="Char"){
+			}else if(tipocampos[i]==2){
 				tamanosreales.push_back(sizeof(char));
 				totalbuffer += sizeof(char);
-			}else if(tipocampos[i]=="Integer"){
+			}else if(tipocampos[i]==3){
 				tamanosreales.push_back(sizeof(int));
 				totalbuffer += sizeof(int);
-			}else if(tipocampos[i]=="Float"){
+			}else if(tipocampos[i]==5){
 				tamanosreales.push_back(sizeof(float));
 				totalbuffer += sizeof(float);
-			}else if(tipocampos[i]=="Double"){
+			}else if(tipocampos[i]==4){
 				tamanosreales.push_back(sizeof(double));
 				totalbuffer += sizeof(double);
 			}
@@ -205,21 +229,21 @@ int main(int argc, char** argv){
 			}
 			progress = 0;
 			for (int i = 0; i < tipocampos.size(); i++){
-				if (tipocampos[i]=="String"){
+				if (tipocampos[i]==1){
 					char chain[sizes[i]];
 					memcpy(chain, buffer+progress, sizes[i]-1);
 					chain[sizes[i]-1] = '\0';
 					progress += sizes[i];
 					cout<<setw(10)<<chain;
 					
-				}else if(tipocampos[i]=="Char"){
+				}else if(tipocampos[i]==2){
 					char car[2];
 					memcpy(car,buffer+progress,sizeof(char));
 					progress += sizeof(char);
 					car[1] = '\0';
 					cout<<setw(10)<<car;
 				
-				}else if(tipocampos[i]=="Integer"){
+				}else if(tipocampos[i]==3){
 					charint elEntero;
 					int entero;
 					memcpy(elEntero.raw,buffer+progress,sizeof(int));
@@ -227,7 +251,7 @@ int main(int argc, char** argv){
 					entero = elEntero.num;
 					cout<<setw(10)<<entero;
 
-				}else if(tipocampos[i]=="Float"){
+				}else if(tipocampos[i]==5){
 					charfloat elFloat;
 					float elFlotante;
 					memcpy(elFloat.raw,buffer+progress,sizeof(float));
@@ -235,7 +259,7 @@ int main(int argc, char** argv){
 					elFlotante = elFloat.num;
 					cout<<setw(10)<<elFlotante;
 				
-				}else if(tipocampos[i]=="Double"){
+				}else if(tipocampos[i]==4){
 					chardouble elDouble;
 					double elDoble;
 					memcpy(elDouble.raw,buffer+progress,sizeof(double));
@@ -245,7 +269,7 @@ int main(int argc, char** argv){
 				}
 			}
 			cout<<endl;
-		}
+		}*/
 		in.close();
 
 	}else if(opcion2==3){
