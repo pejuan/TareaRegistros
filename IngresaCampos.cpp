@@ -159,7 +159,7 @@ int main(int argc, char** argv){
 		cout<<CantidadCampos<<endl;
 		char BufferNombres[CantidadCampos*sizeof(char)*20];
 		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
-		cout<<"Antes de leer los campos"<<endl;
+
 		int progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
 			char eslabon[20];
@@ -167,26 +167,33 @@ int main(int argc, char** argv){
 			eslabon[19]='\0';
 			cout<<setw(10)<<eslabon;
 			progreso += sizeof(char)*20;
-			//nombrecampos[i] = eslabon;
+			nombrecampos.push_back(eslabon);
+			//nombrecampos[i] = eslabon; causaba segmentation fault
 		}
 
-		cout<<endl<<"Despues de leer los campos"<<endl;
-		/*
+
+		
 		char BufferTipo[CantidadCampos*sizeof(int)];
 		in.read(BufferTipo,CantidadCampos*sizeof(int));
 		charint CI;
+		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(CI.raw,BufferTipo+sizeof(int),sizeof(int));
-			tipocampos[i] = CI.num;
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+			//tipocampos[i] = CI.num;
 		}
 		/////////
 
 		char BufferSizes[CantidadCampos*sizeof(int)];
 		charint elSize;
 		in.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
-			memcpy(elSize.raw,BufferTipo+sizeof(int),sizeof(int));
-			sizes[i] = elSize.num;
+			memcpy(elSize.raw,BufferTipo+progreso,sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+			//sizes[i] = elSize.num;
 		}
 
 
@@ -212,11 +219,10 @@ int main(int argc, char** argv){
 			}
 		}
 		/////////////////////////////////////////////////////////////
-		cout<<endl<<endl;
-		for (int i = 0; i < nombrecampos.size(); i++)
+		/*for (int i = 0; i < nombrecampos.size(); i++)
 		{
 			cout<<setw(10)<<nombrecampos[i];
-		}
+		}*/
 		cout<<endl<<"---------------------------------------------------------------------"<<endl;
 		
 		char buffer[totalbuffer];
@@ -269,7 +275,7 @@ int main(int argc, char** argv){
 				}
 			}
 			cout<<endl;
-		}*/
+		}
 		in.close();
 
 	}else if(opcion2==3){
