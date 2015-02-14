@@ -269,7 +269,126 @@ int main(int argc, char** argv){
 
 	}else if(opcion2==4){
 
-	}
+		ifstream in("Registro.bin", ios::in|ios::binary);
+		tipocampos.clear();
+		nombrecampos.clear();
+		sizes.clear();
+		char buf[sizeof(int)];
+		in.read(buf,sizeof(int));
+		charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));
+		CantidadCampos = primeraleida.num;
+		char BufferNombres[CantidadCampos*sizeof(char)*20];
+		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		int progreso = 0;
+		cout<<setw(10)<<"Indice";
+		for (int i = 0; i < CantidadCampos; ++i){
+			char eslabon[20];
+			memcpy(eslabon,BufferNombres+progreso,19);
+			eslabon[19]='\0';
+			cout<<setw(10)<<eslabon;
+			progreso += sizeof(char)*20;
+			nombrecampos.push_back(eslabon);
+		}	
+		char BufferTipo[CantidadCampos*sizeof(int)];
+		in.read(BufferTipo,CantidadCampos*sizeof(int));
+		charint CI;
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+		}
+		/////////
+		char BufferSizes[CantidadCampos*sizeof(int)];
+		charint elSize;
+		in.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+		}
+
+		///////////////////////////
+		int totalbuffer = 0;
+		vector<int> tamanosreales;
+		for (int i = 0; i < tipocampos.size(); i++){
+			if (tipocampos[i]==1){
+				tamanosreales.push_back(sizeof(char)*sizes[i]);
+				totalbuffer += sizeof(char)*sizes[i];	
+			}else if(tipocampos[i]==2){
+				tamanosreales.push_back(sizeof(char));
+				totalbuffer += sizeof(char);
+			}else if(tipocampos[i]==3){
+				tamanosreales.push_back(sizeof(int));
+				totalbuffer += sizeof(int);
+			}else if(tipocampos[i]==5){
+				tamanosreales.push_back(sizeof(float));
+				totalbuffer += sizeof(float);
+			}else if(tipocampos[i]==4){
+				tamanosreales.push_back(sizeof(double));
+				totalbuffer += sizeof(double);
+			}
+		}
+		cout<<endl<<"---------------------------------------------------------------------"<<endl;		
+		char buffer[totalbuffer];
+		int progress = 0;
+		int correlativo = -1;
+		while(in.good()){ ///quitar el eof
+			correlativo++;
+			in.read(buffer,totalbuffer);
+			if(in.eof()){
+				break;
+			}
+			progress = 0;
+			cout<<setw(10)<<correlativo;
+			for (int i = 0; i < tipocampos.size(); i++){
+				if (tipocampos[i]==1){
+					char chain[sizes[i]];
+					memcpy(chain, buffer+progress, sizes[i]-1);
+					chain[sizes[i]-1] = '\0';
+					progress += sizes[i];
+					cout<<setw(10)<<chain;
+					
+				}else if(tipocampos[i]==2){
+					char car[2];
+					memcpy(car,buffer+progress,sizeof(char));
+					progress += sizeof(char);
+					car[1] = '\0';
+					cout<<setw(10)<<car;
+				
+				}else if(tipocampos[i]==3){
+					charint elEntero;
+					int entero;
+					memcpy(elEntero.raw,buffer+progress,sizeof(int));
+					progress += sizeof(int);
+					entero = elEntero.num;
+					cout<<setw(10)<<entero;
+
+				}else if(tipocampos[i]==5){
+					charfloat elFloat;
+					float elFlotante;
+					memcpy(elFloat.raw,buffer+progress,sizeof(float));
+					progress += sizeof(float);
+					elFlotante = elFloat.num;
+					cout<<setw(10)<<elFlotante;
+				
+				}else if(tipocampos[i]==4){
+					chardouble elDouble;
+					double elDoble;
+					memcpy(elDouble.raw,buffer+progress,sizeof(double));
+					progress += sizeof(double);
+					elDoble = elDouble.num;
+					cout<<setw(10)<<elDoble;
+				}
+			}
+			cout<<endl;
+		}
+		in.close();
+		int indiceBorrado;
+
+	}//end if 4
 
 	return 0;
 }
