@@ -708,7 +708,9 @@ int main(int argc, char** argv){
 						char datiles[sizes[fieldIndex]];
 						memcpy(datiles, lectura+minioffset,tamanoDato-1);
 						datiles[tamanoDato-1] = '\0';
-						if (datiles == llaveString){
+						string elDatil = datiles;
+						string comparacion = llaveString;
+						if (elDatil == comparacion){
 							found = true;
 						}
 
@@ -796,6 +798,31 @@ int main(int argc, char** argv){
 				contador++;
 			}
 			busq.close();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}
 
 
