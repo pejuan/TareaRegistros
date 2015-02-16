@@ -670,10 +670,8 @@ int main(int argc, char** argv){
 			offset += CantidadCampos*sizeof(char)*20;
 			offset += CantidadCampos*sizeof(int);
 			offset += CantidadCampos*sizeof(int);
-			char garbage[offset];
 			ifstream busq("Registro.bin",ios::in|ios::binary);
-			busq.read(garbage,offset);
-
+			busq.seekg(offset);
 			char lectura[totalbuffer];
 			int minioffset = 0;
 			for (int i = 0; i < fieldIndex; ++i){
