@@ -958,8 +958,7 @@ int main(int argc, char** argv){
 		offset += CantidadCampos*sizeof(int);
 		offset += CantidadCampos*sizeof(int);
 		offset += totalbuffer*indiceModificado;
-		char buffMod[offset];
-		mod.read(buffMod,offset);
+		mod.seekp(offset);
 
 		cout<<"Ingrese los datos:"<<endl;
 			for (int i = 0; i < tipocampos.size(); ++i){
