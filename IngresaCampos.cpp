@@ -494,8 +494,7 @@ int main(int argc, char** argv){
 		offset += CantidadCampos*sizeof(int);
 		offset += CantidadCampos*sizeof(int);
 		offset += totalbuffer*indiceBorrado;
-		char buffErase[offset];
-		er.read(buffErase,offset);
+		er.seekp(offset);
 		char mark = '*';
 		er.write(reinterpret_cast<char*>(&mark),sizeof(char));
 		er.close();
@@ -569,7 +568,7 @@ int main(int argc, char** argv){
 		cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por Indice"<<endl<<"2)Por Campo"<<endl
 			<<"Ingrese codigo de opcion:";
 		cin>>metodo;
-		if (metodo==1){
+		if (metodo==1){////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			ifstream busq("Registro.bin",ios::in|ios::binary);
 			cout<<"Ingrese el indice del registro que quiere desplegar:";
 			int index;
@@ -580,8 +579,7 @@ int main(int argc, char** argv){
 			offset += CantidadCampos*sizeof(int);
 			offset += CantidadCampos*sizeof(int);
 			offset += totalbuffer*index;
-			char bufferBusqueda[offset];
-			busq.read(bufferBusqueda,offset);
+			busq.seekg(offset);
 			char buffer[totalbuffer];
 			busq.read(buffer,totalbuffer);
 			for (int i = 0; i < tipocampos.size(); ++i){
@@ -662,6 +660,11 @@ int main(int argc, char** argv){
 				cin>>llaveFloat;
 				tamanoDato = sizeof(float);
 			}
+			////////////////////////////////////////////////////////////////////////////////////////
+
+			////////////////////////////////////////////////////////////////////////////////////////
+
+			////////////////////////////////////////////////////////////////////////////////////////
 			int offset = 0;
 			offset += sizeof(int);
 			offset += CantidadCampos*sizeof(char)*20;
