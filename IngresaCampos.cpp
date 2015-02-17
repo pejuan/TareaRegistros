@@ -1095,7 +1095,7 @@ int main(int argc, char** argv){
 	}else if(opcion2==7){
 
 		ifstream in("Registro.bin", ios::in|ios::binary);
-		ofstream out("tmp.bin", ios::in|ios::binary);
+		ofstream out("tmp.bin", ios::out|ios::binary);
 		tipocampos.clear();
 		nombrecampos.clear();
 		AvailList.clear();
@@ -1105,9 +1105,12 @@ int main(int argc, char** argv){
 		charint primeraleida;
 		memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
 		CantidadCampos = primeraleida.num;
+		out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int));
 		charint primerAvail;
 		memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 		AvailList.push_back(primerAvail.num);
+		int tmpint = primerAvail.num;
+		out.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
 		char BufferNombres[CantidadCampos*sizeof(char)*20];
 		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 		int progreso = 0;
@@ -1115,7 +1118,8 @@ int main(int argc, char** argv){
 			char eslabon[20];
 			memcpy(eslabon,BufferNombres+progreso,19);
 			eslabon[19]='\0';
-			cout<<setw(15)<<eslabon;
+			out.write(reinterpret_cast<char*>(&eslabon), sizeof(char)*20);
+			//cout<<setw(15)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
 		}	
@@ -1125,6 +1129,8 @@ int main(int argc, char** argv){
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
 			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			int tmpint2 = CI.num;
+			out.write(reinterpret_cast<char*>(&tmpint2), sizeof(int));
 			tipocampos.push_back(CI.num);
 			progreso += sizeof(int);
 		}
@@ -1135,6 +1141,8 @@ int main(int argc, char** argv){
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
 			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			int tmpint3 = elSize.num;
+			out.write(reinterpret_cast<char*>(&tmpint3), sizeof(int));
 			sizes.push_back(elSize.num);
 			progreso += sizeof(int);
 		}
@@ -1160,7 +1168,6 @@ int main(int argc, char** argv){
 				totalbuffer += sizeof(double);
 			}
 		}
-		cout<<endl<<"---------------------------------------------------------------------"<<endl;		
 		char buffer[totalbuffer];
 		int progress = 0;
 		while(in.good()){ ///quitar el eof
@@ -1182,70 +1189,180 @@ int main(int argc, char** argv){
 						memcpy(chain, buffer+progress, sizes[i]-1);
 						chain[sizes[i]-1] = '\0';
 						progress += sizes[i];
-						cout<<setw(15)<<chain;
-					
+						out.write(reinterpret_cast<char*>(&chain), sizeof(char)*sizes[i]);					
 					}else if(tipocampos[i]==2){
 						char car[2];
 						memcpy(car,buffer+progress,sizeof(char));
+						out.write(reinterpret_cast<char*>(&car), sizeof(char));
 						progress += sizeof(char);
-						car[1] = '\0';
-						cout<<setw(15)<<car;
-				
+						car[1] = '\0';				
 					}else if(tipocampos[i]==3){
 						charint elEntero;
 						int entero;
 						memcpy(elEntero.raw,buffer+progress,sizeof(int));
 						progress += sizeof(int);
 						entero = elEntero.num;
-						cout<<setw(15)<<entero;
-
+						out.write(reinterpret_cast<char*>(&entero), sizeof(int));
 					}else if(tipocampos[i]==5){
 						charfloat elFloat;
 						float elFlotante;
 						memcpy(elFloat.raw,buffer+progress,sizeof(float));
 						progress += sizeof(float);
 						elFlotante = elFloat.num;
-						cout<<setw(15)<<elFlotante;
-				
+						out.write(reinterpret_cast<char*>(&elFlotante), sizeof(float));				
 					}else if(tipocampos[i]==4){
 						chardouble elDouble;
 						double elDoble;
 						memcpy(elDouble.raw,buffer+progress,sizeof(double));
 						progress += sizeof(double);
 						elDoble = elDouble.num;
-						cout<<setw(15)<<elDoble;
+						out.write(reinterpret_cast<char*>(&elDoble), sizeof(double));
 					}
 				}
 				cout<<endl;
 			}
 		}
 		in.close();
+		out.close();
+
+		ofstream outp("Registro.bin",ios::out|ios::binary);
+		ifstream inp("tmp.bin",ios::in|ios::binary);
 
 
 
+		tipocampos.clear();
+		nombrecampos.clear();
+		tamanosreales.clear();
+		AvailList.clear();
+		sizes.clear();
+		//char buf[sizeof(int)*2];
+		inp.read(buf,sizeof(int)*2);
+		//charint primeraleida;
+		memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
+		CantidadCampos = primeraleida.num;
+		outp.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int));
+		//charint primerAvail;
+		memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
+		AvailList.push_back(primerAvail.num);
+		tmpint = primerAvail.num;
+		outp.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
+		//char BufferNombres[CantidadCampos*sizeof(char)*20];
+		inp.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			char eslabon2[20];
+			memcpy(eslabon2,BufferNombres+progreso,19);
+			eslabon2[19]='\0';
+			outp.write(reinterpret_cast<char*>(&eslabon2), sizeof(char)*20);
+			//cout<<setw(15)<<eslabon;
+			progreso += sizeof(char)*20;
+			nombrecampos.push_back(eslabon2);
+		}	
+		//char BufferTipo[CantidadCampos*sizeof(int)];
+		inp.read(BufferTipo,CantidadCampos*sizeof(int));
+		//charint CI;
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+			int tmpint7 = CI.num;
+			outp.write(reinterpret_cast<char*>(&tmpint7), sizeof(int));
+			tipocampos.push_back(CI.num);
+			progreso += sizeof(int);
+		}
+		/////////
+		//char BufferSizes[CantidadCampos*sizeof(int)];
+		//charint elSize;
+		inp.read(BufferSizes,CantidadCampos*sizeof(int));
+		progreso = 0;
+		for (int i = 0; i < CantidadCampos; ++i){
+			memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+			int tmpint3 = elSize.num;
+			outp.write(reinterpret_cast<char*>(&tmpint3), sizeof(int));
+			sizes.push_back(elSize.num);
+			progreso += sizeof(int);
+		}
 
+		///////////////////////////
+		totalbuffer = 0;
+		tamanosreales.clear();
+		for (int i = 0; i < tipocampos.size(); i++){
+			if (tipocampos[i]==1){
+				tamanosreales.push_back(sizeof(char)*sizes[i]);
+				totalbuffer += sizeof(char)*sizes[i];	
+			}else if(tipocampos[i]==2){
+				tamanosreales.push_back(sizeof(char));
+				totalbuffer += sizeof(char);
+			}else if(tipocampos[i]==3){
+				tamanosreales.push_back(sizeof(int));
+				totalbuffer += sizeof(int);
+			}else if(tipocampos[i]==5){
+				tamanosreales.push_back(sizeof(float));
+				totalbuffer += sizeof(float);
+			}else if(tipocampos[i]==4){
+				tamanosreales.push_back(sizeof(double));
+				totalbuffer += sizeof(double);
+			}
+		}
+		//char buffer[totalbuffer];
+		progress = 0;
+		while(inp.good()){ ///quitar el eof
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			inp.read(buffer,totalbuffer);
+			if(inp.eof()){
+				break;
+			}
+			progress = 0;
+			char verificacion[2];
+			memcpy(verificacion,buffer,sizeof(char));
+			verificacion[1] = '\0';
+			if (verificacion[0]=='*'){
+				
+			}else{
+				for (int i = 0; i < tipocampos.size(); i++){
+					if (tipocampos[i]==1){
+						char chain2[sizes[i]];
+						memcpy(chain2, buffer+progress, sizes[i]-1);
+						chain2[sizes[i]-1] = '\0';
+						progress += sizes[i];
+						outp.write(reinterpret_cast<char*>(&chain2), sizeof(char)*sizes[i]);					
+					}else if(tipocampos[i]==2){
+						char car2[2];
+						memcpy(car2,buffer+progress,sizeof(char));
+						outp.write(reinterpret_cast<char*>(&car2), sizeof(char));
+						progress += sizeof(char);
+						car2[1] = '\0';				
+					}else if(tipocampos[i]==3){
+						charint elEntero;
+						int entero;
+						memcpy(elEntero.raw,buffer+progress,sizeof(int));
+						progress += sizeof(int);
+						entero = elEntero.num;
+						outp.write(reinterpret_cast<char*>(&entero), sizeof(int));
+					}else if(tipocampos[i]==5){
+						charfloat elFloat;
+						float elFlotante;
+						memcpy(elFloat.raw,buffer+progress,sizeof(float));
+						progress += sizeof(float);
+						elFlotante = elFloat.num;
+						outp.write(reinterpret_cast<char*>(&elFlotante), sizeof(float));				
+					}else if(tipocampos[i]==4){
+						chardouble elDouble;
+						double elDoble;
+						memcpy(elDouble.raw,buffer+progress,sizeof(double));
+						progress += sizeof(double);
+						elDoble = elDouble.num;
+						outp.write(reinterpret_cast<char*>(&elDoble), sizeof(double));
+					}
+				}
+				cout<<endl;
+			}
+		}
+		inp.close();
+		outp.close();
+		ofstream erase("tmp.bin", ios::out|ios::binary);
+		char asterisco = '*';
+		erase.write(reinterpret_cast<char*>(&asterisco),sizeof(char));
+		erase.close();
 
 	}
 
