@@ -297,7 +297,6 @@ int main(int argc, char** argv){
 		memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 		int cualquier = primerAvail.num;
 		AvailList.push_back(cualquier);
-		cout<<AvailList[0]<<endl;
 		char BufferNombres[CantidadCampos*sizeof(char)*20];
 		in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 		int progreso = 0;
@@ -1119,7 +1118,6 @@ int main(int argc, char** argv){
 			memcpy(eslabon,BufferNombres+progreso,19);
 			eslabon[19]='\0';
 			out.write(reinterpret_cast<char*>(&eslabon), sizeof(char)*20);
-			//cout<<setw(15)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon);
 		}	
@@ -1227,26 +1225,19 @@ int main(int argc, char** argv){
 
 		ofstream outp("Registro.bin",ios::out|ios::binary);
 		ifstream inp("tmp.bin",ios::in|ios::binary);
-
-
-
 		tipocampos.clear();
 		nombrecampos.clear();
 		tamanosreales.clear();
 		AvailList.clear();
 		sizes.clear();
-		//char buf[sizeof(int)*2];
 		inp.read(buf,sizeof(int)*2);
-		//charint primeraleida;
 		memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
 		CantidadCampos = primeraleida.num;
 		outp.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int));
-		//charint primerAvail;
 		memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 		AvailList.push_back(primerAvail.num);
 		tmpint = primerAvail.num;
 		outp.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
-		//char BufferNombres[CantidadCampos*sizeof(char)*20];
 		inp.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
@@ -1254,13 +1245,10 @@ int main(int argc, char** argv){
 			memcpy(eslabon2,BufferNombres+progreso,19);
 			eslabon2[19]='\0';
 			outp.write(reinterpret_cast<char*>(&eslabon2), sizeof(char)*20);
-			//cout<<setw(15)<<eslabon;
 			progreso += sizeof(char)*20;
 			nombrecampos.push_back(eslabon2);
 		}	
-		//char BufferTipo[CantidadCampos*sizeof(int)];
 		inp.read(BufferTipo,CantidadCampos*sizeof(int));
-		//charint CI;
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
 			memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
@@ -1270,8 +1258,6 @@ int main(int argc, char** argv){
 			progreso += sizeof(int);
 		}
 		/////////
-		//char BufferSizes[CantidadCampos*sizeof(int)];
-		//charint elSize;
 		inp.read(BufferSizes,CantidadCampos*sizeof(int));
 		progreso = 0;
 		for (int i = 0; i < CantidadCampos; ++i){
@@ -1303,7 +1289,6 @@ int main(int argc, char** argv){
 				totalbuffer += sizeof(double);
 			}
 		}
-		//char buffer[totalbuffer];
 		progress = 0;
 		while(inp.good()){ ///quitar el eof
 
