@@ -151,6 +151,8 @@ int main(int argc, char** argv){
 			bool exists = false;
 			bool continuar = true;
 			while(true){
+				exists = false;
+				continuar = true;
 				cout<<"Ingrese los datos:"<<endl;
 				while(continuar){
 					if(tipoLlave==1){
@@ -166,8 +168,24 @@ int main(int argc, char** argv){
 						}
 						if(!exists){
 							listaStrKeys.push_back(strcadenallave);
+							out.write(reinterpret_cast<char*>(&strcadenallave),sizeof(char)*20);
+							continuar=false;
 						}
 					}else{
+						cout<<"Ingrese el entero perteneciente al campo llave llamado "<<namekeyespejo<<":";
+						char intllave;
+						cin>>intllave;
+						for (int i = 0; i < listaIntKeys.size(); i++){
+							if(intllave==listaStrKeys[i]){
+								exists = true;
+								cout<<"Llave primaria no debe repetirse!"<<endl;
+							}
+						}
+						if(!exists){
+							listaIntKeys.push_back(intllave);
+							out.write(reinterpret_cast<char*>(&intllave),sizeof(int));
+							continuar=false;
+						}
 
 					}
 				}
