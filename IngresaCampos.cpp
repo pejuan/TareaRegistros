@@ -594,7 +594,7 @@ int main(int argc, char** argv){
 			}
 			in.close();
 			int indiceBorrado;
-			cout<<"Ingrese el indice de el registro que desea eliminar:";
+			cout<<"Ingrese el RRn de el registro que desea eliminar:";
 			cin>>indiceBorrado;
 			int offset = 0;
 			offset += sizeof(int)*2;
@@ -691,7 +691,7 @@ int main(int argc, char** argv){
 				}
 			}
 			in.close();
-			cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por Indice"<<endl<<"2)Por Campo"<<endl
+			cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por RRN"<<endl<<"2)Por Campo"<<endl
 				<<"Ingrese codigo de opcion:";
 			cin>>metodo;
 			if (metodo==1){////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1053,7 +1053,7 @@ int main(int argc, char** argv){
 			}
 			in.close();
 			int indiceModificado;
-			cout<<"Ingrese el indice de el registro que desea modificar:";
+			cout<<"Ingrese el RRN de el registro que desea modificar:";
 			cin>>indiceModificado;
 			fstream mod("Registro.bin", ios::out|ios::in|ios::binary);
 
