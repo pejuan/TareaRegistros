@@ -20,6 +20,16 @@ union chardouble{
 	char raw[sizeof(double)];
 	double num;
 };
+struct IndString
+{
+	int rrn;
+	char key[20];
+};
+struct IndNum
+{
+	int rrn;
+	int key;
+};
 
 int main(int argc, char** argv){
 	while(true){
@@ -28,18 +38,23 @@ int main(int argc, char** argv){
 		vector<string> espejoCampos;
 		vector<int> sizes;
 		vector<int> AvailList;
+		vector<int> listaIntKeys;
+		vector<string> listaStrKeys;
 		int opcion;
 		int tamano;
 		int CantidadCampos;
+		char namekey[20];
+		string namekeyespejo;
 		char nombre[20];
 		int opcion2;
+		int tipoLlave;
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
 		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
-			cout<<"Ingrese cuantos campos tendra su estructura: ";
+			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
 			ofstream out("Registro.bin", ios::out|ios::binary);
 			int avail = -1;
@@ -47,6 +62,24 @@ int main(int argc, char** argv){
 			out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
 			out.write(reinterpret_cast<char*>(&avail), sizeof(int)); //Guarda el primer elemento de avail list
 			int contador = 0;
+			IndString keyStr;
+			IndNum keyNum;
+			cout<<"---------------------"<<endl<<"1)String"<<endl<<"2)Integer"<<endl<<"Ingrese de que tipo sera su Llave primaria:";
+			cin>>tipoLlave;
+			if(tipoLlave==1){
+				cout<<"Ingrese el nombre de su llave de tipo String:";
+				cin>>namekey;
+				namekeyespejo = namekey;
+				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
+			}else{
+				tipocampos = 2;
+				cout<<"Ingrese el nombre de su llave de tipo Integer:";
+				cin>>namekey;
+				namekeyespejo = namekey;
+				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
+			}
 			while(true){
 				cout<<endl
 					<<"1)String"<<endl<<"2)Char"<<endl<<"3)Integer"<<endl<<"4)Double"<<endl<<"5)Float"<<endl
@@ -114,9 +147,31 @@ int main(int argc, char** argv){
 			}
 			cout<<"-------------------------------------------------"<<endl;
 			
-
+			int counter = 0;
+			bool exists = false;
+			bool continuar = true;
 			while(true){
 				cout<<"Ingrese los datos:"<<endl;
+				while(continuar){
+					if(tipoLlave==1){
+						cout<<"Ingrese la cadena perteneciente al campo llave llamado "<<namekeyespejo<<":";
+						char cadenallave[20];
+						cin>>cadenallave;
+						string strcadenallave = cadenallave;
+						for (int i = 0; i < listaStrKeys.size(); i++){
+							if(strcadenallave==listaStrKeys[i]){
+								exists = true;
+								cout<<"Llave primaria no debe repetirse!"<<endl;
+							}
+						}
+						if(!exists){
+							listaStrKeys.push_back(strcadenallave);
+						}
+					}else{
+
+					}
+				}
+				
 				for (int i = 0; i < tipocampos.size(); ++i){
 					if(tipocampos[i]==1){
 						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
