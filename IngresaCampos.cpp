@@ -56,6 +56,7 @@ int main(int argc, char** argv){
 		if (opcion2==1){
 			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
+			CantidadCampos++;
 			ofstream out("Registro.bin", ios::out|ios::binary);
 			int avail = -1;
 			AvailList.push_back(avail);
@@ -70,15 +71,23 @@ int main(int argc, char** argv){
 				cout<<"Ingrese el nombre de su llave de tipo String:";
 				cin>>namekey;
 				namekeyespejo = namekey;
+				nombrecampos.push_back(namekey);
+				espejoCampos.push_back(namekey);
 				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
 				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
+				tipocampos.push_back(1);
+				sizes.push_back(20);
 			}else{
-				tipocampos = 2;
+				tipoLlave = 3;
+				tipocampos.push_back(3);
 				cout<<"Ingrese el nombre de su llave de tipo Integer:";
 				cin>>namekey;
 				namekeyespejo = namekey;
+				nombrecampos.push_back(namekey);
+				espejoCampos.push_back(namekey);
 				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
 				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
+				sizes.push_back(0);
 			}
 			while(true){
 				cout<<endl
@@ -132,7 +141,7 @@ int main(int argc, char** argv){
 				}
 
 				contador++;
-				if (contador==CantidadCampos){
+				if (contador==(CantidadCampos-1)){
 					break;
 				}
 			}
@@ -168,15 +177,15 @@ int main(int argc, char** argv){
 						}
 						if(!exists){
 							listaStrKeys.push_back(strcadenallave);
-							out.write(reinterpret_cast<char*>(&strcadenallave),sizeof(char)*20);
+							out.write(reinterpret_cast<char*>(&cadenallave),sizeof(char)*20);
 							continuar=false;
 						}
 					}else{
 						cout<<"Ingrese el entero perteneciente al campo llave llamado "<<namekeyespejo<<":";
-						char intllave;
+						int intllave;
 						cin>>intllave;
 						for (int i = 0; i < listaIntKeys.size(); i++){
-							if(intllave==listaStrKeys[i]){
+							if(intllave==listaIntKeys[i]){
 								exists = true;
 								cout<<"Llave primaria no debe repetirse!"<<endl;
 							}
@@ -190,7 +199,7 @@ int main(int argc, char** argv){
 					}
 				}
 				
-				for (int i = 0; i < tipocampos.size(); ++i){
+				for (int i = 1; i < tipocampos.size(); ++i){
 					if(tipocampos[i]==1){
 						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
 						char cadena[sizes[i]];
@@ -237,14 +246,17 @@ int main(int argc, char** argv){
 			nombrecampos.clear();
 			AvailList.clear();
 			sizes.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3]; //antes tenia *2
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
 			CantidadCampos = primeraleida.num;
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			AvailList.push_back(primerAvail.num);
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
