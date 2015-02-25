@@ -30,7 +30,8 @@ struct IndNum
 	int rrn;
 	int key;
 };
-static void quicksort(vector<IndNum>, int, int);
+void quicksort(int[],int, int, int[]);
+
 int main(int argc, char** argv){
 	while(true){
 		vector<int> tipocampos;
@@ -1436,10 +1437,10 @@ int main(int argc, char** argv){
 			inRRN.seekg(offset);
 			char buffer[totalbuffer];
 			int contadorRRN = 0;
-			while(in.good()){ ///quitar el eof
+			while(inRRN.good()){ ///quitar el eof
 
-				in.read(buffer,totalbuffer);
-				if(in.eof()){
+				inRRN.read(buffer,totalbuffer);
+				if(inRRN.eof()){
 					break;
 				}
 				if(tipoLlave==1){
@@ -1460,14 +1461,34 @@ int main(int argc, char** argv){
 				contadorRRN++;
 			}
 			inRRN.close();
+			cout<<endl;
+			if(tipoLlave != 1){
+				int keysArray[listaindicesINT.size()];
+				int rrnArray[listaindicesINT.size()];
+				for (int i = 0; i < listaindicesINT.size(); ++i)
+				{
+					//cout<<listaindicesINT[i].key<<" ";
+					keysArray[i] = listaindicesINT[i].key;
+					rrnArray[i] = listaindicesINT[i].rrn;
+					//cout<<keysArray[i]<<":"<<rrnArray[i]<<" ";
+				}
+				cout<<endl;
+				///////////////////////////////////////////////////////////////////////
+				quicksort(keysArray,0,listaindicesINT.size()-1, rrnArray);
 
-
-			///////////////////////////////////////////////////////////////////////
-
-
-			///////////////////////////////////////////////////////////////////////
-
-			
+				///////////////////////////////////////////////////////////////////////
+				int hasta = listaindicesINT.size();
+				listaindicesINT.clear();
+				for (int i = 0; i < hasta; ++i)
+				{
+					//cout<<keysArray[i]<<":"<<rrnArray[i]<<" ";
+					IndNum ind;
+					ind.rrn = rrnArray[i];
+					ind.key = keysArray[i];
+					listaindicesINT.push_back(ind);
+				}
+				cout<<endl;
+			}//end if is not tipollave==1
 		}
 
 
@@ -1478,25 +1499,31 @@ int main(int argc, char** argv){
 	return 0;
 }
 
-static void quicksort(vector<IndNum> A, int izq, int der) {
- int pivote=A[izq].key; // tomamos primer elemento como pivote
+void quicksort(int A[], int izq, int der, int B[]) {
+ int pivote=A[izq]; // tomamos primer elemento como pivote
+ int pivote2 = B[izq];
  int i=izq; // i realiza la búsqueda de izquierda a derecha
  int j=der; // j realiza la búsqueda de derecha a izquierda
  int aux;
-
- while(i<j){            // mientras no se crucen las búsquedas
-    while(A[i].key <=pivote && i<j) i++; // busca elemento mayor que pivote
-    while(A[j].key >pivote) j--;         // busca elemento menor que pivote
-    if (i<j) {                      // si no se han cruzado                      
-        aux= A[i].key;                  // los intercambia
-        A[i].key = A[j].key;
-        A[j].key = aux;
-    }
-  }
-  A[izq].key =A[j].key; // se coloca el pivote en su lugar de forma que tendremos
-  A[j].key =pivote; // los menores a su izquierda y los mayores a su derecha
-  if(izq<j-1)
-     quicksort(A,izq,j-1); // ordenamos subarray izquierdo
-  if(j+1 <der)
-     quicksort(A,j+1,der); // ordenamos subarray derecho
+ int aux2;
+	while(i<j){            // mientras no se crucen las búsquedas
+    	while(A[i]<=pivote && i<j) i++; // busca elemento mayor que pivote
+    	while(A[j]>pivote) j--;         // busca elemento menor que pivote
+    	if (i<j) {                      // si no se han cruzado                      
+	        aux= A[i]; 
+	        aux2 = B[i];                 // los intercambia
+	        A[i]=A[j];
+	        B[i]=B[j];
+	        A[j]=aux;
+	        B[j]=aux2;
+    	}
+ 	}
+  A[izq]=A[j]; // se coloca el pivote en su lugar de forma que tendremos
+  B[izq]=B[j];
+  A[j]=pivote; // los menores a su izquierda y los mayores a su derecha
+  B[j]= pivote2;
+	if(izq<j-1)
+		quicksort(A,izq,j-1,B); // ordenamos subarray izquierdo
+	if(j+1 <der)
+     	quicksort(A,j+1,der,B); // ordenamos subarray derecho
 }
