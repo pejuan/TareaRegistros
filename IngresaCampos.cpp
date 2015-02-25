@@ -44,6 +44,7 @@ int main(int argc, char** argv){
 		int tamano;
 		int CantidadCampos;
 		char namekey[20];
+		char fileName[20];
 		string namekeyespejo;
 		char nombre[20];
 		int opcion2;
@@ -54,10 +55,12 @@ int main(int argc, char** argv){
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
 			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
 			CantidadCampos++;
-			ofstream out("Registro.bin", ios::out|ios::binary);
+			ofstream out(fileName, ios::out|ios::binary);
 			int avail = -1;
 			AvailList.push_back(avail);
 			out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
@@ -241,7 +244,9 @@ int main(int argc, char** argv){
 				}
 			}
 		}else if(opcion2==2){ //Leer
-			ifstream in("Registro.bin", ios::in|ios::binary); //cambiar de vuelta a registro.bin
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
+			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
@@ -372,14 +377,16 @@ int main(int argc, char** argv){
 
 		}else if(opcion2==3){//Append
 			char resp2;
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
+			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
 			sizes.clear();
 			espejoCampos.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3];
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));
 			CantidadCampos = primeraleida.num;
@@ -387,6 +394,9 @@ int main(int argc, char** argv){
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			int cualquier = primerAvail.num;
 			AvailList.push_back(cualquier);
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
@@ -443,12 +453,12 @@ int main(int argc, char** argv){
 			while(true){
 				cout<<"Ingrese los datos:"<<endl;
 				if(false){ //AvailList[0] != -1
-					ifstream getting("Registro.bin",ios::in|ios::binary);	
+					ifstream getting(fileName,ios::in|ios::binary);	
 					cout<<AvailList[0]<<endl;
 					cualquier = AvailList[0];
 					cout<<"Cualquier:"<<cualquier<<endl;		
 					int offset = 0;
-					offset += sizeof(int)*2;
+					offset += sizeof(int)*3;
 					offset += CantidadCampos*sizeof(char)*20;
 					offset += CantidadCampos*sizeof(int);
 					offset += CantidadCampos*sizeof(int);
@@ -461,11 +471,11 @@ int main(int argc, char** argv){
 					int premiereAvail = NextAvail.num;
 					getting.close();
 					cout<<"premiereAvail:"<<premiereAvail<<endl;
-					ofstream addAvail("Registro.bin", ios::out|ios::binary);
+					ofstream addAvail(fileName, ios::out|ios::binary);
 					addAvail.seekp(sizeof(int));
 					addAvail.write(reinterpret_cast<char*>(&premiereAvail),sizeof(int));
 					addAvail.close();
-					ofstream rempl("Registro.bin", ios::out|ios::binary);
+					ofstream rempl(fileName, ios::out|ios::binary);
 					rempl.seekp(offset);
 					AvailList[0] = premiereAvail;
 					cout<<AvailList[0]<<endl;
@@ -510,7 +520,7 @@ int main(int argc, char** argv){
 					}
 
 				}else{
-					ofstream append("Registro.bin", ios::out|ios::in|ios::app|ios::binary);
+					ofstream append(fileName, ios::out|ios::in|ios::app|ios::binary);
 					for (int i = 0; i < tipocampos.size(); ++i){
 						if(tipocampos[i]==1){
 							cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
@@ -555,21 +565,24 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==4){//Borrar
-
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
+			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
 			sizes.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3];
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));
 			CantidadCampos = primeraleida.num;
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			AvailList.push_back(primerAvail.num);
-			cout<<AvailList[0]<<endl;
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
@@ -682,7 +695,7 @@ int main(int argc, char** argv){
 			cout<<"Ingrese el RRn de el registro que desea eliminar:";
 			cin>>indiceBorrado;
 			int offset = 0;
-			offset += sizeof(int)*2;
+			offset += sizeof(int)*3;
 			offset += CantidadCampos*sizeof(char)*20;
 			offset += CantidadCampos*sizeof(int);
 			offset += CantidadCampos*sizeof(int);
@@ -708,21 +721,25 @@ int main(int argc, char** argv){
 			act.close();
 			//end if 4
 		}else if(opcion2==5){//buscar
-
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
 			int metodo;
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
 			sizes.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3];
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));
 			CantidadCampos = primeraleida.num;
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			AvailList.push_back(primerAvail.num);
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
@@ -780,12 +797,12 @@ int main(int argc, char** argv){
 				<<"Ingrese codigo de opcion:";
 			cin>>metodo;
 			if (metodo==1){////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				ifstream busq("Registro.bin",ios::in|ios::binary);
-				cout<<"Ingrese el indice del registro que quiere desplegar:";
+				ifstream busq(fileName,ios::in|ios::binary);
+				cout<<"Ingrese el RRN del registro que quiere desplegar:";
 				int index;
 				cin>>index;
 				int offset = 0;
-				offset += sizeof(int)*2;
+				offset += sizeof(int)*3;
 				offset += CantidadCampos*sizeof(char)*20;
 				offset += CantidadCampos*sizeof(int);
 				offset += CantidadCampos*sizeof(int);
@@ -877,11 +894,11 @@ int main(int argc, char** argv){
 
 				////////////////////////////////////////////////////////////////////////////////////////
 				int offset = 0;
-				offset += sizeof(int)*2;
+				offset += sizeof(int)*3;
 				offset += CantidadCampos*sizeof(char)*20;
 				offset += CantidadCampos*sizeof(int);
 				offset += CantidadCampos*sizeof(int);
-				ifstream busq("Registro.bin",ios::in|ios::binary);
+				ifstream busq(fileName,ios::in|ios::binary);
 				busq.seekg(offset);
 				char lectura[totalbuffer];
 				int minioffset = 0;
@@ -1015,19 +1032,23 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==6){//modificar
-
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
+			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
 			sizes.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3];
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));
 			CantidadCampos = primeraleida.num;
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			AvailList.push_back(primerAvail.num);
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
@@ -1143,7 +1164,7 @@ int main(int argc, char** argv){
 			fstream mod("Registro.bin", ios::out|ios::in|ios::binary);
 
 			int offset = 0;
-			offset += sizeof(int)*2;
+			offset += sizeof(int)*3;
 			offset += CantidadCampos*sizeof(char)*20;
 			offset += CantidadCampos*sizeof(int);
 			offset += CantidadCampos*sizeof(int);
@@ -1184,15 +1205,16 @@ int main(int argc, char** argv){
 			cout<<"Modificado con exito!"<<endl;
 
 		}else if(opcion2==7){//Compactar
-
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			cin>>fileName;
+			ifstream in(fileName, ios::in|ios::binary);
 			ofstream out("tmp.bin", ios::out|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
 			sizes.clear();
-			char buf[sizeof(int)*2];
-			in.read(buf,sizeof(int)*2);
+			char buf[sizeof(int)*3];
+			in.read(buf,sizeof(int)*3);
 			charint primeraleida;
 			memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
 			CantidadCampos = primeraleida.num;
@@ -1200,6 +1222,9 @@ int main(int argc, char** argv){
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
 			AvailList.push_back(primerAvail.num);
+			charint primeratipoLLave;
+			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+			tipoLlave = primeratipoLLave.num;
 			int tmpint = primerAvail.num;
 			out.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
@@ -1313,8 +1338,8 @@ int main(int argc, char** argv){
 			}
 			in.close();
 			out.close();
-			remove("Registro.bin");
-			int result = rename("tmp.bin","Registro.bin");
+			remove(fileName);
+			int result = rename("tmp.bin",fileName);
 			cout<<"Archivo compactado con éxito."<<endl;
 		}else if(opcion2 == 8){
 			break;
