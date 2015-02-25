@@ -241,7 +241,7 @@ int main(int argc, char** argv){
 				}
 			}
 		}else if(opcion2==2){ //Leer
-			ifstream in("Registro.bin", ios::in|ios::binary);
+			ifstream in("Registro.bin", ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
