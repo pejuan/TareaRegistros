@@ -52,7 +52,8 @@ int main(int argc, char** argv){
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
 		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
-			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl<<"Ingrese el codigo de lo que desea hacer:";
+			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
+			<<"9)Keysort"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
@@ -1343,6 +1344,10 @@ int main(int argc, char** argv){
 			cout<<"Archivo compactado con éxito."<<endl;
 		}else if(opcion2 == 8){
 			break;
+		}else if(opcion2 == 9){
+
+
+			
 		}
 	}
 	
