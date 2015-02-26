@@ -52,6 +52,7 @@ int main(int argc, char** argv){
 		char nombre[20];
 		int opcion2;
 		int tipoLlave;
+
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
 		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar mas registros"<<endl<<"4)Borrar registro"<<endl
@@ -61,6 +62,9 @@ int main(int argc, char** argv){
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
 			CantidadCampos++;
@@ -208,27 +212,27 @@ int main(int argc, char** argv){
 				
 				for (int i = 1; i < tipocampos.size(); ++i){
 					if(tipocampos[i]==1){
-						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
 						char cadena[sizes[i]];
 						cin>>cadena;
 						out.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
 					}else if(tipocampos[i]==2){
-						cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+						cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<":";
 						char caracter;
 						cin>>caracter;
 						out.write(reinterpret_cast<char*>(&caracter), sizeof(char));
 					}else if(tipocampos[i]==3){
-						cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+						cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<":";
 						int entero;
 						cin>>entero;
 						out.write(reinterpret_cast<char*>(&entero), sizeof(int));
 					}else if(tipocampos[i]==5){
-						cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+						cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<":";
 						float flotante;
 						cin>>flotante;
 						out.write(reinterpret_cast<char*>(&flotante), sizeof(float));
 					}else{
-						cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+						cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<":";
 						double doble;
 						cin>>doble;
 						out.write(reinterpret_cast<char*>(&doble), sizeof(double));
@@ -250,6 +254,9 @@ int main(int argc, char** argv){
 		}else if(opcion2==2){ //Leer
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -383,6 +390,9 @@ int main(int argc, char** argv){
 			char resp2;
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -571,6 +581,9 @@ int main(int argc, char** argv){
 		}else if(opcion2==4){//Borrar
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -590,7 +603,7 @@ int main(int argc, char** argv){
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
-			cout<<setw(10)<<"Indice";
+			cout<<setw(10)<<"RRN";
 			for (int i = 0; i < CantidadCampos; ++i){
 				char eslabon[20];
 				memcpy(eslabon,BufferNombres+progreso,19);
@@ -696,7 +709,7 @@ int main(int argc, char** argv){
 			}
 			in.close();
 			int indiceBorrado;
-			cout<<"Ingrese el RRn de el registro que desea eliminar:";
+			cout<<"Ingrese el RRN de el registro que desea eliminar:";
 			cin>>indiceBorrado;
 			int offset = 0;
 			offset += sizeof(int)*3;
@@ -727,6 +740,9 @@ int main(int argc, char** argv){
 		}else if(opcion2==5){//buscar
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			int metodo;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
@@ -1038,6 +1054,9 @@ int main(int argc, char** argv){
 		}else if(opcion2==6){//modificar
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -1056,7 +1075,7 @@ int main(int argc, char** argv){
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
-			cout<<setw(10)<<"Indice";
+			cout<<setw(10)<<"RRN";
 			for (int i = 0; i < CantidadCampos; ++i){
 				char eslabon[20];
 				memcpy(eslabon,BufferNombres+progreso,19);
@@ -1211,6 +1230,9 @@ int main(int argc, char** argv){
 		}else if(opcion2==7){//Compactar
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary);
 			ofstream out("tmp.bin", ios::out|ios::binary);
 			tipocampos.clear();
@@ -1358,6 +1380,9 @@ int main(int argc, char** argv){
 			listaindicesINT.clear();
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
+			stringstream arch;
+			arch<<fileName<<".bin";
+			arch>>fileName;
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -1465,8 +1490,7 @@ int main(int argc, char** argv){
 			if(tipoLlave != 1){
 				int keysArray[listaindicesINT.size()];
 				int rrnArray[listaindicesINT.size()];
-				for (int i = 0; i < listaindicesINT.size(); ++i)
-				{
+				for (int i = 0; i < listaindicesINT.size(); ++i){
 					//cout<<listaindicesINT[i].key<<" ";
 					keysArray[i] = listaindicesINT[i].key;
 					rrnArray[i] = listaindicesINT[i].rrn;
@@ -1479,16 +1503,188 @@ int main(int argc, char** argv){
 				///////////////////////////////////////////////////////////////////////
 				int hasta = listaindicesINT.size();
 				listaindicesINT.clear();
-				for (int i = 0; i < hasta; ++i)
-				{
-					//cout<<keysArray[i]<<":"<<rrnArray[i]<<" ";
+				for (int i = 0; i < hasta; ++i){
 					IndNum ind;
 					ind.rrn = rrnArray[i];
 					ind.key = keysArray[i];
 					listaindicesINT.push_back(ind);
 				}
 				cout<<endl;
-			}//end if is not tipollave==1
+				stringstream ss;
+				ss<<fileName<<".index";
+				char nombreIndices[26];
+				ss>>nombreIndices;
+				fstream out(nombreIndices, ios::out|ios::binary);
+				for (int i = 0; i < listaindicesINT.size(); ++i){
+					int numerito, numerote;
+					numerito = rrnArray[i];
+					numerote = keysArray[i];
+					out.write(reinterpret_cast<char*>(&numerito),sizeof(int));
+					//out.write(reinterpret_cast<char*>(&numerote),sizeof(int));
+				}
+				out.close();
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				ifstream in2(fileName,ios::in|ios::binary);
+				ofstream out2("tmp.bin",ios::out|ios::binary);
+				tipocampos.clear();
+				nombrecampos.clear();
+				AvailList.clear();
+				sizes.clear();
+				char buf[sizeof(int)*3]; //antes tenia *2
+				in2.read(buf,sizeof(int)*3);
+				charint primeraleida;
+				memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
+				CantidadCampos = primeraleida.num;
+				out2.write(reinterpret_cast<char*>(&CantidadCampos),sizeof(int));
+				charint primerAvail;
+				memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
+				int hola = primerAvail.num;
+				AvailList.push_back(hola);
+				out2.write(reinterpret_cast<char*>(&hola),sizeof(int));
+				charint primeratipoLLave;
+				memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+				tipoLlave = primeratipoLLave.num;
+				out2.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+				char BufferNombres[CantidadCampos*sizeof(char)*20];
+				in2.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+				int progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					char eslabon[20];
+					memcpy(eslabon,BufferNombres+progreso,19);
+					eslabon[19]='\0';
+					cout<<setw(15)<<eslabon;
+					progreso += sizeof(char)*20;
+					out2.write(reinterpret_cast<char*>(&eslabon),sizeof(char)*20);
+					nombrecampos.push_back(eslabon);
+				}	
+				char BufferTipo[CantidadCampos*sizeof(int)];
+				in2.read(BufferTipo,CantidadCampos*sizeof(int));
+				charint CI;
+				progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+					int cant = CI.num;
+					out2.write(reinterpret_cast<char*>(&cant),sizeof(int));
+					tipocampos.push_back(CI.num);
+					progreso += sizeof(int);
+				}
+				/////////
+				char BufferSizes[CantidadCampos*sizeof(int)];
+				charint elSize;
+				in2.read(BufferSizes,CantidadCampos*sizeof(int));
+				progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+					int tamanito = elSize.num;
+					out2.write(reinterpret_cast<char*>(&tamanito),sizeof(int));
+					sizes.push_back(elSize.num);
+					progreso += sizeof(int);
+				}
+
+				///////////////////////////
+				int totalbuffer = 0;
+				vector<int> tamanosreales;
+				for (int i = 0; i < tipocampos.size(); i++){
+					if (tipocampos[i]==1){
+						tamanosreales.push_back(sizeof(char)*sizes[i]);
+						totalbuffer += sizeof(char)*sizes[i];	
+					}else if(tipocampos[i]==2){
+						tamanosreales.push_back(sizeof(char));
+						totalbuffer += sizeof(char);
+					}else if(tipocampos[i]==3){
+						tamanosreales.push_back(sizeof(int));
+						totalbuffer += sizeof(int);
+					}else if(tipocampos[i]==5){
+						tamanosreales.push_back(sizeof(float));
+						totalbuffer += sizeof(float);
+					}else if(tipocampos[i]==4){
+						tamanosreales.push_back(sizeof(double));
+						totalbuffer += sizeof(double);
+					}
+				}
+				cout<<endl<<"---------------------------------------------------------------------"<<endl;		
+				char buffer[totalbuffer];
+				int progress = 0;
+				in2.close();
+				for (int k = 0; k < listaindicesINT.size(); k++){
+					ifstream in3(fileName, ios::in|ios::binary);
+					int mux = rrnArray[k];
+					offset = 0;
+					offset += sizeof(int)*3;
+					offset += CantidadCampos*sizeof(char)*20;
+					offset += CantidadCampos*sizeof(int);
+					offset += CantidadCampos*sizeof(int);
+					offset += totalbuffer*mux;
+					in3.seekg(offset);
+					char buffersito[totalbuffer];
+					in3.read(buffersito,totalbuffer);
+					progress = 0;
+					for (int i = 0; i < CantidadCampos; ++i){
+						if (tipocampos[i]==1){
+							char chain[sizes[i]];
+							memcpy(chain, buffersito+progress, sizes[i]-1);
+							chain[sizes[i]-1] = '\0';
+							progress += sizes[i];
+							out2.write(reinterpret_cast<char*>(&chain),sizeof(char)*sizes[i]);
+						
+						}else if(tipocampos[i]==2){
+							char car[2];
+							memcpy(car,buffersito+progress,sizeof(char));
+							out2.write(reinterpret_cast<char*>(&car),sizeof(char));
+							progress += sizeof(char);
+							car[1] = '\0';
+							
+							
+					
+						}else if(tipocampos[i]==3){
+							charint elEntero;
+							int entero;
+							memcpy(elEntero.raw,buffersito+progress,sizeof(int));
+							progress += sizeof(int);
+							entero = elEntero.num;
+							out2.write(reinterpret_cast<char*>(&entero),sizeof(int));
+							
+
+						}else if(tipocampos[i]==5){
+							charfloat elFloat;
+							float elFlotante;
+							memcpy(elFloat.raw,buffersito+progress,sizeof(float));
+							progress += sizeof(float);
+							elFlotante = elFloat.num;
+							out2.write(reinterpret_cast<char*>(&elFlotante),sizeof(float));
+					
+						}else if(tipocampos[i]==4){
+							chardouble elDouble;
+							double elDoble;
+							memcpy(elDouble.raw,buffersito+progress,sizeof(double));
+							progress += sizeof(double);
+							elDoble = elDouble.num;
+							out2.write(reinterpret_cast<char*>(&elDoble),sizeof(double));
+							
+						}
+					}
+						
+					in3.close();
+				}
+				out.close();
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				remove(fileName);
+				int result = rename("tmp.bin",fileName);
+				cout<<"Registros ordenados con éxito!"<<endl;
+
+
+			}else{//end if is not tipollave==1
+
+
+			}
 		}
 
 
