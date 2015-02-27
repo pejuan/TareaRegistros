@@ -1949,9 +1949,10 @@ int main(int argc, char** argv){
 				}
 				remove(fileName);
 				int result = rename("tmp.bin",fileName);
-				cout<<"Registros ordenados con éxito!"<<endl;
+				cout<<"Registro agregado con éxito!"<<endl;
 
 
+			}else{//si la llave es string
 
 			}
 
