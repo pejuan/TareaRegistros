@@ -31,6 +31,7 @@ struct IndNum
 	int key;
 };
 void quicksort(int[],int, int, int[]);
+void sort(string[],int,int,int[]);
 
 int main(int argc, char** argv){
 	while(true){
@@ -1555,7 +1556,7 @@ int main(int argc, char** argv){
 					progreso += sizeof(char)*20;
 					out2.write(reinterpret_cast<char*>(&eslabon),sizeof(char)*20);
 					nombrecampos.push_back(eslabon);
-				}	
+				}	//marca
 				char BufferTipo[CantidadCampos*sizeof(int)];
 				in2.read(BufferTipo,CantidadCampos*sizeof(int));
 				charint CI;
@@ -1677,10 +1678,210 @@ int main(int argc, char** argv){
 
 
 			}else{//end if is not tipollave==1
+				string keysArrayStr[listaindicesstrings.size()];
+				int rrnArray[listaindicesstrings.size()];
+				for (int i = 0; i < listaindicesstrings.size(); ++i){
+					keysArrayStr[i] = listaindicesstrings[i].key;
+					rrnArray[i] = listaindicesstrings[i].rrn;
+				}
+				sort(keysArrayStr,0,listaindicesstrings.size()-1, rrnArray);
+
+				///////////////////////////////////////////////////////////////////////
+				int hasta = listaindicesstrings.size();
+				listaindicesstrings.clear();
+				for (int i = 0; i < hasta; ++i){
+					IndString ind;
+					ind.rrn = rrnArray[i];
+					//ind.key = keysArrayStr[i];
+					strcpy(ind.key,keysArrayStr[i].c_str());
+					listaindicesstrings.push_back(ind);
+				}
+				cout<<endl;
+				stringstream ss;
+				ss<<fileName<<".index";
+				char nombreIndices[26];
+				ss>>nombreIndices;
+				fstream out(nombreIndices, ios::out|ios::binary);
+				for (int i = 0; i < listaindicesINT.size(); ++i){
+					int numerito;
+					char theString[20];
+					numerito = rrnArray[i];
+					//theString = keysArrayStr[i].c_str();
+					strcpy(theString,keysArrayStr[i].c_str());
+					out.write(reinterpret_cast<char*>(&theString),sizeof(char)*20);
+				}
+				out.close();
+				/////////////////////////////////////////////////////////////////////////////
+				ifstream in2(fileName,ios::in|ios::binary);
+				ofstream out2("tmp.bin",ios::out|ios::binary);
+				tipocampos.clear();
+				nombrecampos.clear();
+				AvailList.clear();
+				sizes.clear();
+				char buf[sizeof(int)*3]; //antes tenia *2
+				in2.read(buf,sizeof(int)*3);
+				charint primeraleida;
+				memcpy(primeraleida.raw,buf,sizeof(int));//Copia al buffer la cantidad de campos
+				CantidadCampos = primeraleida.num;
+				out2.write(reinterpret_cast<char*>(&CantidadCampos),sizeof(int));
+				charint primerAvail;
+				memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
+				int firstAvail = primerAvail.num;
+				AvailList.push_back(firstAvail);
+				out2.write(reinterpret_cast<char*>(&firstAvail),sizeof(int));
+				charint primeratipoLLave;
+				memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
+				tipoLlave = primeratipoLLave.num;
+				out2.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+				char BufferNombres[CantidadCampos*sizeof(char)*20];
+				in2.read(BufferNombres,CantidadCampos*sizeof(char)*20);
+				int progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					char eslabon[20];
+					memcpy(eslabon,BufferNombres+progreso,19);
+					eslabon[19]='\0';
+					cout<<setw(15)<<eslabon;
+					progreso += sizeof(char)*20;
+					out2.write(reinterpret_cast<char*>(&eslabon),sizeof(char)*20);
+					nombrecampos.push_back(eslabon);
+				}
+				char BufferTipo[CantidadCampos*sizeof(int)];
+				in2.read(BufferTipo,CantidadCampos*sizeof(int));
+				charint CI;
+				progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
+					int cant = CI.num;
+					out2.write(reinterpret_cast<char*>(&cant),sizeof(int));
+					tipocampos.push_back(CI.num);
+					progreso += sizeof(int);
+				}
+				/////////
+				char BufferSizes[CantidadCampos*sizeof(int)];
+				charint elSize;
+				in2.read(BufferSizes,CantidadCampos*sizeof(int));
+				progreso = 0;
+				for (int i = 0; i < CantidadCampos; ++i){
+					memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
+					int tamanito = elSize.num;
+					out2.write(reinterpret_cast<char*>(&tamanito),sizeof(int));
+					sizes.push_back(elSize.num);
+					progreso += sizeof(int);
+				}
+				int totalbuffer = 0;
+				vector<int> tamanosreales;
+				for (int i = 0; i < tipocampos.size(); i++){
+					if (tipocampos[i]==1){
+						tamanosreales.push_back(sizeof(char)*sizes[i]);
+						totalbuffer += sizeof(char)*sizes[i];	
+					}else if(tipocampos[i]==2){
+						tamanosreales.push_back(sizeof(char));
+						totalbuffer += sizeof(char);
+					}else if(tipocampos[i]==3){
+						tamanosreales.push_back(sizeof(int));
+						totalbuffer += sizeof(int);
+					}else if(tipocampos[i]==5){
+						tamanosreales.push_back(sizeof(float));
+						totalbuffer += sizeof(float);
+					}else if(tipocampos[i]==4){
+						tamanosreales.push_back(sizeof(double));
+						totalbuffer += sizeof(double);
+					}
+				}
+				cout<<endl<<"---------------------------------------------------------------------"<<endl;		
+				char buffer[totalbuffer];
+				int progress = 0;
+				in2.close();
+				for (int k = 0; k < listaindicesstrings.size(); k++){
+					ifstream in3(fileName, ios::in|ios::binary);
+					int mux = rrnArray[k];
+					offset = 0;
+					offset += sizeof(int)*3;
+					offset += CantidadCampos*sizeof(char)*20;
+					offset += CantidadCampos*sizeof(int);
+					offset += CantidadCampos*sizeof(int);
+					offset += totalbuffer*mux;
+					in3.seekg(offset);
+					char buffersito[totalbuffer];
+					in3.read(buffersito,totalbuffer);
+					progress = 0;
+					for (int i = 0; i < CantidadCampos; ++i){
+						if (tipocampos[i]==1){
+							char chain[sizes[i]];
+							memcpy(chain, buffersito+progress, sizes[i]-1);
+							chain[sizes[i]-1] = '\0';
+							progress += sizes[i];
+							out2.write(reinterpret_cast<char*>(&chain),sizeof(char)*sizes[i]);
+						
+						}else if(tipocampos[i]==2){
+							char car[2];
+							memcpy(car,buffersito+progress,sizeof(char));
+							out2.write(reinterpret_cast<char*>(&car),sizeof(char));
+							progress += sizeof(char);
+							car[1] = '\0';	
+					
+						}else if(tipocampos[i]==3){
+							charint elEntero;
+							int entero;
+							memcpy(elEntero.raw,buffersito+progress,sizeof(int));
+							progress += sizeof(int);
+							entero = elEntero.num;
+							out2.write(reinterpret_cast<char*>(&entero),sizeof(int));
+							
+
+						}else if(tipocampos[i]==5){
+							charfloat elFloat;
+							float elFlotante;
+							memcpy(elFloat.raw,buffersito+progress,sizeof(float));
+							progress += sizeof(float);
+							elFlotante = elFloat.num;
+							out2.write(reinterpret_cast<char*>(&elFlotante),sizeof(float));
+					
+						}else if(tipocampos[i]==4){
+							chardouble elDouble;
+							double elDoble;
+							memcpy(elDouble.raw,buffersito+progress,sizeof(double));
+							progress += sizeof(double);
+							elDoble = elDouble.num;
+							out2.write(reinterpret_cast<char*>(&elDoble),sizeof(double));
+							
+						}
+					}
+						
+					in3.close();
+				}
+				out.close();
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				/////////////////////////////////////////////////////////////////////////////////////////
+				remove(fileName);
+				int result = rename("tmp.bin",fileName);
+				cout<<"Registros ordenados con éxito!"<<endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 			}
-		}else if(opcion2==10){
+		}else if(opcion2==10){//agregar usando índices
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
 			espejoCampos.clear();
@@ -1993,4 +2194,32 @@ void quicksort(int A[], int izq, int der, int B[]) {
 		quicksort(A,izq,j-1,B); // ordenamos subarray izquierdo
 	if(j+1 <der)
      	quicksort(A,j+1,der,B); // ordenamos subarray derecho
+}
+void sort(string A[], int izq, int der, int B[]){
+	string pivote = A[izq]; // tomamos primer elemento como pivote
+	int pivote2 = B[izq];
+	int i=izq; // i realiza la búsqueda de izquierda a derecha
+	int j=der; // j realiza la búsqueda de derecha a izquierda
+	string aux;
+	int aux2;
+	while(i<j){            // mientras no se crucen las búsquedas
+	   	while(A[i].compare(pivote)<=0 && i<j) i++; // busca elemento mayor que pivote
+	   	while(A[j].compare(pivote)>0) j--;         // busca elemento menor que pivote
+	   	if (i<j) {                      // si no se han cruzado                      
+	        aux= A[i]; 
+	        aux2 = B[i];                 // los intercambia
+	        A[i]=A[j];
+	        B[i]=B[j];
+	        A[j]=aux;
+	        B[j]=aux2;
+	   	}
+	}
+	A[izq]=A[j]; // se coloca el pivote en su lugar de forma que tendremos
+	B[izq]=B[j];
+	A[j]=pivote; // los menores a su izquierda y los mayores a su derecha
+	B[j]= pivote2;
+	if(izq<j-1)
+		sort(A,izq,j-1,B); // ordenamos subarray izquierdo
+	if(j+1 < der)
+	   	sort(A,j+1,der,B); // ordenamos subarray derecho
 }
