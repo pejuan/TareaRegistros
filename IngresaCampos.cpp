@@ -718,7 +718,7 @@ int main(int argc, char** argv){
 			offset += CantidadCampos*sizeof(int);
 			offset += CantidadCampos*sizeof(int);
 			offset += totalbuffer*indiceBorrado;
-			ifstream checker("Registro.bin",ios::in|ios::binary);
+			ifstream checker(fileName,ios::in|ios::binary);
 			checker.seekg(sizeof(int));
 			char charAvail[sizeof(int)];
 			checker.read(charAvail,sizeof(int));
@@ -726,14 +726,14 @@ int main(int argc, char** argv){
 			memcpy(tmp.raw,charAvail,sizeof(int));
 			int tmpnum = tmp.num;
 			checker.close();
-			fstream er("Registro.bin", ios::out|ios::in|ios::binary);	
+			fstream er(fileName, ios::out|ios::in|ios::binary);	
 			er.seekp(offset);
 			char mark = '*';
 			er.write(reinterpret_cast<char*>(&mark),sizeof(char));
 			er.write(reinterpret_cast<char*>(&tmpnum),sizeof(int));
 			er.close();
 			cout<<"Borrado con exito!"<<endl;
-			fstream act("Registro.bin", ios::out|ios::in|ios::binary);
+			fstream act(fileName, ios::out|ios::in|ios::binary);
 			act.seekp(sizeof(int));
 			act.write(reinterpret_cast<char*>(&indiceBorrado),sizeof(int));
 			act.close();
@@ -1254,6 +1254,7 @@ int main(int argc, char** argv){
 			tipoLlave = primeratipoLLave.num;
 			int tmpint = primerAvail.num;
 			out.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
+			out.write(reinterpret_cast<char*>(&tipoLlave), sizeof(int));
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
 			in.read(BufferNombres,CantidadCampos*sizeof(char)*20);
 			int progreso = 0;
@@ -1979,6 +1980,7 @@ int main(int argc, char** argv){
 			char buffer[totalbuffer];
 			int contadorRRN = 0;
 			vector<int> keysArrayINT;
+			vector<string> keysArrayStr;
 			vector<int> rrnArray;
 			while(inRRN.good()){ ///quitar el eof
 
@@ -1991,8 +1993,10 @@ int main(int argc, char** argv){
 					ind.rrn = contadorRRN;
 					memcpy(ind.key,buffer,sizeof(char)*19);
 					ind.key[19] = '\0';
+					string theKeyStr = ind.key;
 					listaindicesstrings.push_back(ind);
-
+					rrnArray.push_back(contadorRRN);
+					keysArrayStr.push_back(theKeyStr);
 				}else{
 					IndNum ind2;
 					ind2.rrn = contadorRRN;
@@ -2019,7 +2023,7 @@ int main(int argc, char** argv){
 						posicionAIngresar = 0;
 						break;
 					}else if(keykey>keysArrayINT[i] && keykey<keysArrayINT[i+1]){
-						posicionAIngresar = 1;
+						posicionAIngresar = i;
 						break;
 					}
 				}
@@ -2155,7 +2159,151 @@ int main(int argc, char** argv){
 
 			}else{//si la llave es string
 
-			}
+				cout<<"Ingrese la cadena perteneciente a la llave "<<espejoCampos[0]<<":";
+				string keykeyStr;
+				int posicionAIngresar = -1;
+				cin>>keykeyStr;
+				for (int i = 0; i < listaindicesstrings.size()-1; i++){
+					if (keykeyStr.compare(keysArrayStr[0])<0){
+						posicionAIngresar = 0;
+						break;
+					}else if(keykeyStr.compare(keysArrayStr[i])>0 && keykeyStr.compare(keysArrayStr[i+1])<0){
+						posicionAIngresar = i;
+						break;
+					}
+				}
+				char theKeyAlBin[20];
+				strcpy(theKeyAlBin,keykeyStr.c_str());
+				ifstream inNuevo(fileName,ios::in|ios::binary);
+				inNuevo.seekg(offset);
+				int progress = 0;
+				for (int i = 0; i < listaindicesstrings.size(); ++i)
+				{
+					inNuevo.read(buffer,totalbuffer);
+					if(inNuevo.eof()){
+						break;
+					}
+					progress = 0;
+					char verificacion[2];
+					memcpy(verificacion,buffer,sizeof(char));
+					verificacion[1] = '\0';
+					if (verificacion[0]=='*'){
+						
+					}else{
+						for (int i = 0; i < tipocampos.size(); i++){
+							if (tipocampos[i]==1){
+								char chain[sizes[i]];
+								memcpy(chain, buffer+progress, sizes[i]-1);
+								chain[sizes[i]-1] = '\0';
+								progress += sizes[i];
+								out.write(reinterpret_cast<char*>(&chain), sizeof(char)*sizes[i]);
+							
+							}else if(tipocampos[i]==2){
+								char car[2];
+								memcpy(car,buffer+progress,sizeof(char));
+								out.write(reinterpret_cast<char*>(&car), sizeof(char));
+								progress += sizeof(char);
+								car[1] = '\0';
+						
+							}else if(tipocampos[i]==3){
+								charint elEntero;
+								int entero;
+								memcpy(elEntero.raw,buffer+progress,sizeof(int));
+								progress += sizeof(int);
+								entero = elEntero.num;
+								out.write(reinterpret_cast<char*>(&entero), sizeof(int));
+
+							}else if(tipocampos[i]==5){
+								charfloat elFloat;
+								float elFlotante;
+								memcpy(elFloat.raw,buffer+progress,sizeof(float));
+								progress += sizeof(float);
+								elFlotante = elFloat.num;
+								out.write(reinterpret_cast<char*>(&elFlotante), sizeof(float));
+							}else if(tipocampos[i]==4){
+								chardouble elDouble;
+								double elDoble;
+								memcpy(elDouble.raw,buffer+progress,sizeof(double));
+								progress += sizeof(double);
+								elDoble = elDouble.num;
+								out.write(reinterpret_cast<char*>(&elDoble), sizeof(double));
+							}
+						}
+						cout<<endl;
+					}
+					if (i == posicionAIngresar){
+						out.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
+						for (int i = 1; i < CantidadCampos; ++i){
+							if(tipocampos[i]==1){
+								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
+								char cadena[sizes[i]];
+								cin>>cadena;
+								out.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+							}else if(tipocampos[i]==2){
+								cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<":";
+								char caracter;
+								cin>>caracter;
+								out.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+							}else if(tipocampos[i]==3){
+								cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<":";
+								int entero;
+								cin>>entero;
+								out.write(reinterpret_cast<char*>(&entero), sizeof(int));
+							}else if(tipocampos[i]==5){
+								cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<":";
+								float flotante;
+								cin>>flotante;
+								out.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+							}else{
+								cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<":";
+								double doble;
+								cin>>doble;
+								out.write(reinterpret_cast<char*>(&doble), sizeof(double));
+							}
+						}
+					}
+				}//fin del for
+				inNuevo.close();
+				if(posicionAIngresar == -1){
+					out.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
+					for (int i = 1; i < CantidadCampos; ++i){
+						if(tipocampos[i]==1){
+							cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
+							char cadena[sizes[i]];
+							cin>>cadena;
+							out.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+						}else if(tipocampos[i]==2){
+							cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<":";
+							char caracter;
+							cin>>caracter;
+							out.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+						}else if(tipocampos[i]==3){
+							cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<":";
+							int entero;
+							cin>>entero;
+							out.write(reinterpret_cast<char*>(&entero), sizeof(int));
+						}else if(tipocampos[i]==5){
+							cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<":";
+							float flotante;
+							cin>>flotante;
+							out.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+						}else{
+							cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<":";
+							double doble;
+							cin>>doble;
+							out.write(reinterpret_cast<char*>(&doble), sizeof(double));
+						}
+					}
+					out.close();
+				}else{
+					out.close();
+				}
+
+				remove(fileName);
+				int result = rename("tmp.bin",fileName);
+				cout<<"Registro agregado con éxito!"<<endl;
+
+			}//end if key instance of string
 
 		}//end else if 10
 
