@@ -72,14 +72,15 @@ int main(int argc, char** argv){
 			ofstream out(fileName, ios::out|ios::binary);
 			int avail = -1;
 			AvailList.push_back(avail);
-			out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
-			out.write(reinterpret_cast<char*>(&avail), sizeof(int)); //Guarda el primer elemento de avail list
+			 
 			int contador = 0;
 			IndString keyStr;
 			IndNum keyNum;
-			cout<<"---------------------"<<endl<<"1)String"<<endl<<"2)Integer"<<endl<<"Ingrese de que tipo sera su Llave primaria:";
+			cout<<"---------------------"<<endl<<"1)String"<<endl<<"2)Integer"<<endl<<"0)Sin Llave"<<endl<<"Ingrese de que tipo sera su Llave primaria:";
 			cin>>tipoLlave;
 			if(tipoLlave==1){
+				out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+				out.write(reinterpret_cast<char*>(&avail), sizeof(int));//Guarda el primer elemento de avail list
 				cout<<"Ingrese el nombre de su llave de tipo String:";
 				cin>>namekey;
 				namekeyespejo = namekey;
@@ -89,7 +90,9 @@ int main(int argc, char** argv){
 				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
 				tipocampos.push_back(1);
 				sizes.push_back(20);
-			}else{
+			}else if(tipoLlave==2){
+				out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+				out.write(reinterpret_cast<char*>(&avail), sizeof(int));//Guarda el primer elemento de avail list
 				tipoLlave = 3;
 				tipocampos.push_back(3);
 				cout<<"Ingrese el nombre de su llave de tipo Integer:";
@@ -100,6 +103,17 @@ int main(int argc, char** argv){
 				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
 				out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
 				sizes.push_back(0);
+			}else{
+				CantidadCampos--;
+				out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+				out.write(reinterpret_cast<char*>(&avail), sizeof(int));//Guarda el primer elemento de avail list
+				out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+			}
+			int finish;
+			if(tipoLlave==1 || tipoLlave==3){
+				finish = CantidadCampos-1;
+			}else{
+				finish = CantidadCampos;
 			}
 			while(true){
 				cout<<endl
@@ -153,7 +167,7 @@ int main(int argc, char** argv){
 				}
 
 				contador++;
-				if (contador==(CantidadCampos-1)){
+				if (contador==finish){//causa error si no hay llave
 					break;
 				}
 			}
@@ -192,7 +206,7 @@ int main(int argc, char** argv){
 							out.write(reinterpret_cast<char*>(&cadenallave),sizeof(char)*20);
 							continuar=false;
 						}
-					}else{
+					}else if(tipoLlave==3){
 						cout<<"Ingrese el entero perteneciente al campo llave llamado "<<namekeyespejo<<":";
 						int intllave;
 						cin>>intllave;
@@ -208,10 +222,17 @@ int main(int argc, char** argv){
 							continuar=false;
 						}
 
+					}else{
+						break;
 					}
 				}
-				
-				for (int i = 1; i < tipocampos.size(); ++i){
+				int start;
+				if(tipoLlave==1 || tipoLlave==3){
+					start=1;
+				}else{
+					start=0;
+				}
+				for (int i = start; i < tipocampos.size(); ++i){//causa error si no hay llave
 					if(tipocampos[i]==1){
 						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
 						char cadena[sizes[i]];
@@ -1185,7 +1206,7 @@ int main(int argc, char** argv){
 			int indiceModificado;
 			cout<<"Ingrese el RRN de el registro que desea modificar:";
 			cin>>indiceModificado;
-			fstream mod("Registro.bin", ios::out|ios::in|ios::binary);
+			fstream mod(fileName, ios::out|ios::in|ios::binary);
 
 			int offset = 0;
 			offset += sizeof(int)*3;
@@ -1472,19 +1493,21 @@ int main(int argc, char** argv){
 					ind.key[19] = '\0';
 					listaindicesstrings.push_back(ind);
 
-				}else{
+				}else if(tipoLlave==3){
 					IndNum ind2;
 					ind2.rrn = contadorRRN;
 					charint llavecharint;
 					memcpy(llavecharint.raw,buffer,sizeof(int));
 					ind2.key = llavecharint.num;
 					listaindicesINT.push_back(ind2);
+				}else{
+					break;
 				}
 				contadorRRN++;
 			}
 			inRRN.close();
 			cout<<endl;
-			if(tipoLlave != 1){
+			if(tipoLlave == 3){
 				int keysArray[listaindicesINT.size()];
 				int rrnArray[listaindicesINT.size()];
 				for (int i = 0; i < listaindicesINT.size(); ++i){
@@ -1678,7 +1701,7 @@ int main(int argc, char** argv){
 				cout<<"Registros ordenados con éxito!"<<endl;
 
 
-			}else{//end if is not tipollave==1
+			}else if(tipoLlave==1){//end if is not tipollave==1
 				string keysArrayStr[listaindicesstrings.size()];
 				int rrnArray[listaindicesstrings.size()];
 				for (int i = 0; i < listaindicesstrings.size(); ++i){
@@ -1860,27 +1883,8 @@ int main(int argc, char** argv){
 				remove(fileName);
 				int result = rename("tmp.bin",fileName);
 				cout<<"Registros ordenados con éxito!"<<endl;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+			}else{
+				cout<<"Registro no contiene llave!";
 			}
 		}else if(opcion2==10){//agregar usando índices
 			listaindicesstrings.clear();
@@ -1997,7 +2001,7 @@ int main(int argc, char** argv){
 					listaindicesstrings.push_back(ind);
 					rrnArray.push_back(contadorRRN);
 					keysArrayStr.push_back(theKeyStr);
-				}else{
+				}else if(tipoLlave==3){
 					IndNum ind2;
 					ind2.rrn = contadorRRN;
 					charint llavecharint;
@@ -2007,12 +2011,14 @@ int main(int argc, char** argv){
 					listaindicesINT.push_back(ind2);
 					rrnArray.push_back(contadorRRN);
 					keysArrayINT.push_back(thekey);
+				}else{
+					break;
 				}
 				contadorRRN++;
 			}
 			inRRN.close();
 			cout<<endl;
-			if(tipoLlave != 1){
+			if(tipoLlave == 3){
 				//Leer el registro nuevo
 				cout<<"Ingrese el entero perteneciente a la llave "<<espejoCampos[0]<<":";
 				int keykey;
@@ -2157,7 +2163,7 @@ int main(int argc, char** argv){
 				cout<<"Registro agregado con éxito!"<<endl;
 
 
-			}else{//si la llave es string
+			}else if(tipoLlave==1){//si la llave es string
 
 				cout<<"Ingrese la cadena perteneciente a la llave "<<espejoCampos[0]<<":";
 				string keykeyStr;
@@ -2303,8 +2309,9 @@ int main(int argc, char** argv){
 				int result = rename("tmp.bin",fileName);
 				cout<<"Registro agregado con éxito!"<<endl;
 
-			}//end if key instance of string
-
+			}else{//end if key instance of string
+				cout<<"Este registro no contiene llave, utilice la opcion 3 para agregar a este archivo"<<endl;
+			}
 		}//end else if 10
 
 
