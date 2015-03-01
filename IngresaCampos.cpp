@@ -350,6 +350,7 @@ int main(int argc, char** argv){
 			cout<<endl<<"---------------------------------------------------------------------"<<endl;		
 			char buffer[totalbuffer];
 			int progress = 0;
+			int elContador = 1;
 			while(in.good()){ ///quitar el eof
 
 				in.read(buffer,totalbuffer);
@@ -405,6 +406,16 @@ int main(int argc, char** argv){
 					}
 					cout<<endl;
 				}
+				//
+				if(elContador%25 == 0){
+					cout<<"Quiere continuar leyendo datos?[S/N]: ";
+					char option;
+					cin>>option;
+					if(option=='n' || option=='N'){
+						break;
+					}
+				}
+				elContador++;
 			}
 			in.close();
 
