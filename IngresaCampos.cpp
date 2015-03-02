@@ -1749,7 +1749,7 @@ int main(int argc, char** argv){
 				char nombreIndices[26];
 				ss>>nombreIndices;
 				fstream out(nombreIndices, ios::out|ios::binary);
-				for (int i = 0; i < listaindicesINT.size(); ++i){
+				for (int i = 0; i < listaindicesstrings.size(); ++i){
 					int numerito;
 					char theString[20];
 					numerito = rrnArray[i];
