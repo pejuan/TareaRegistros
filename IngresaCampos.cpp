@@ -49,6 +49,7 @@ int main(int argc, char** argv){
 		int CantidadCampos;
 		char namekey[20];
 		char fileName[20];
+		char fileIndexName[30];
 		string namekeyespejo;
 		char nombre[20];
 		int opcion2;
@@ -64,8 +65,11 @@ int main(int argc, char** argv){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
+			stringstream archind;
 			arch<<fileName<<".bin";
 			arch>>fileName;
+			archind<<fileName<<".index";
+			archind>>fileIndexName;
 			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
 			CantidadCampos++;
@@ -185,6 +189,7 @@ int main(int argc, char** argv){
 			int counter = 0;
 			bool exists = false;
 			bool continuar = true;
+			ofstream indexout(fileIndexName, ios::out|ios::binary);
 			while(true){
 				exists = false;
 				continuar = true;
@@ -204,6 +209,7 @@ int main(int argc, char** argv){
 						if(!exists){
 							listaStrKeys.push_back(strcadenallave);
 							out.write(reinterpret_cast<char*>(&cadenallave),sizeof(char)*20);
+							indexout.write(reinterpret_cast<char*>(&cadenallave),sizeof(char)*20);
 							continuar=false;
 						}
 					}else if(tipoLlave==3){
@@ -219,6 +225,7 @@ int main(int argc, char** argv){
 						if(!exists){
 							listaIntKeys.push_back(intllave);
 							out.write(reinterpret_cast<char*>(&intllave),sizeof(int));
+							indexout.write(reinterpret_cast<char*>(&intllave),sizeof(int));
 							continuar=false;
 						}
 
@@ -424,8 +431,11 @@ int main(int argc, char** argv){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
+			stringstream archind;
 			arch<<fileName<<".bin";
 			arch>>fileName;
+			archind<<fileName<<".index";
+			archind>>fileIndexName;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -503,7 +513,6 @@ int main(int argc, char** argv){
 					ifstream getting(fileName,ios::in|ios::binary);	
 					cout<<AvailList[0]<<endl;
 					cualquier = AvailList[0];
-					cout<<"Cualquier:"<<cualquier<<endl;		
 					int offset = 0;
 					offset += sizeof(int)*3;
 					offset += CantidadCampos*sizeof(char)*20;
@@ -517,7 +526,6 @@ int main(int argc, char** argv){
 					memcpy(NextAvail.raw,bufAvail,sizeof(int));
 					int premiereAvail = NextAvail.num;
 					getting.close();
-					cout<<"premiereAvail:"<<premiereAvail<<endl;
 					ofstream addAvail(fileName, ios::out|ios::binary);
 					addAvail.seekp(sizeof(int));
 					addAvail.write(reinterpret_cast<char*>(&premiereAvail),sizeof(int));
@@ -568,12 +576,16 @@ int main(int argc, char** argv){
 
 				}else{
 					ofstream append(fileName, ios::out|ios::in|ios::app|ios::binary);
+					ofstream indexappend(fileIndexName, ios::out|ios::app|ios::binary);
 					for (int i = 0; i < tipocampos.size(); ++i){
 						if(tipocampos[i]==1){
 							cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
 							char cadena[sizes[i]];
 							cin>>cadena;
 							append.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+							if(tipoLlave==1 && i==0){
+								indexappend.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(20));
+							}
 						}else if(tipocampos[i]==2){
 							cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
 							char caracter;
@@ -584,6 +596,9 @@ int main(int argc, char** argv){
 							int entero;
 							cin>>entero;
 							append.write(reinterpret_cast<char*>(&entero), sizeof(int));
+							if(tipoLlave==3 && i==0){
+								indexappend.write(reinterpret_cast<char*>(&entero), sizeof(int));
+							}
 						}else if(tipocampos[i]==5){
 							cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
 							float flotante;
