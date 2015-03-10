@@ -57,9 +57,9 @@ int main(int argc, char** argv){
 
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
-		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar al final"<<endl<<"4)Borrar registro"<<endl
+		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
-			<<"9)Keysort"<<endl<<"10)Agregar con índice"<<endl<<"Ingrese el codigo de lo que desea hacer:";
+			<<"9)Reindexar"<<endl<<"10)Agregar con índice"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
@@ -1553,17 +1553,30 @@ int main(int argc, char** argv){
 				if(tipoLlave==1){
 					IndString ind;
 					ind.rrn = contadorRRN;
-					memcpy(ind.key,buffer,sizeof(char)*19);
-					ind.key[19] = '\0';
-					listaindicesstrings.push_back(ind);
+					char verificacion[2];
+					memcpy(verificacion,buffer,sizeof(char));
+					if(verificacion[0]=='*'){//////si no funciona quitar esta verificacion
+						//quite la reducción del contador porque es el offset, y lo ocupo intacto.
+					}else{
+						memcpy(ind.key,buffer,sizeof(char)*19);
+						ind.key[19] = '\0';
+						listaindicesstrings.push_back(ind);
+					}	
 
 				}else if(tipoLlave==3){
 					IndNum ind2;
 					ind2.rrn = contadorRRN;
 					charint llavecharint;
-					memcpy(llavecharint.raw,buffer,sizeof(int));
-					ind2.key = llavecharint.num;
-					listaindicesINT.push_back(ind2);
+					char verificacion2[2];
+					memcpy(verificacion2,buffer,sizeof(char));
+					if(verificacion2[0]=='*'){
+
+					}else{
+						memcpy(llavecharint.raw,buffer,sizeof(int));
+						ind2.key = llavecharint.num;
+						listaindicesINT.push_back(ind2);
+					}
+					
 				}else{
 					break;
 				}
@@ -1965,8 +1978,8 @@ int main(int argc, char** argv){
 			out.write(reinterpret_cast<char*>(&CantidadCampos),sizeof(int));
 			charint primerAvail;
 			memcpy(primerAvail.raw,buf+sizeof(int),sizeof(int));//Copia al buffer el primer elemento del avail list
-			AvailList.push_back(primerAvail.num);
-			int av2 = primerAvail.num;
+			int av2 = -1; //antes tenia primerAvail.num pero esto esta compactando al mismo tiempo por ende avail list = -1
+			AvailList.push_back(av2);
 			out.write(reinterpret_cast<char*>(&av2),sizeof(int));
 			charint primeratipoLLave;
 			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
