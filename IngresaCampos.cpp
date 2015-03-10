@@ -513,7 +513,7 @@ int main(int argc, char** argv){
 			}
 			while(true){
 				cout<<"Ingrese los datos:"<<endl;
-				if(false){ //AvailList[0] != -1
+				if(AvailList[0] != -1){ //AvailList[0] != -1
 					ifstream getting(fileName,ios::in|ios::binary);	
 					cout<<AvailList[0]<<endl;
 					cualquier = AvailList[0];
@@ -530,11 +530,11 @@ int main(int argc, char** argv){
 					memcpy(NextAvail.raw,bufAvail,sizeof(int));
 					int premiereAvail = NextAvail.num;
 					getting.close();
-					ofstream addAvail(fileName, ios::out|ios::binary);
+					fstream addAvail(fileName, ios::out|ios::in|ios::binary);
 					addAvail.seekp(sizeof(int));
 					addAvail.write(reinterpret_cast<char*>(&premiereAvail),sizeof(int));
 					addAvail.close();
-					ofstream rempl(fileName, ios::out|ios::binary);
+					fstream rempl(fileName, ios::out|ios::in|ios::binary);
 					rempl.seekp(offset);
 					AvailList[0] = premiereAvail;
 					cout<<AvailList[0]<<endl;
@@ -1338,7 +1338,7 @@ int main(int argc, char** argv){
 			charint primeratipoLLave;
 			memcpy(primeratipoLLave.raw,buf+sizeof(int)+sizeof(int),sizeof(int));
 			tipoLlave = primeratipoLLave.num;
-			int tmpint = primerAvail.num;
+			int tmpint = -1; //antes tenia primeravail.num pero al compactar el avail list debe volver a ser -1
 			out.write(reinterpret_cast<char*>(&tmpint), sizeof(int));
 			out.write(reinterpret_cast<char*>(&tipoLlave), sizeof(int));
 			char BufferNombres[CantidadCampos*sizeof(char)*20];
