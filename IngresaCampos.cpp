@@ -20,13 +20,11 @@ union chardouble{
 	char raw[sizeof(double)];
 	double num;
 };
-struct IndString
-{
+struct IndString{
 	int rrn;
 	char key[20];
 };
-struct IndNum
-{
+struct IndNum{
 	int rrn;
 	int key;
 };
@@ -34,6 +32,18 @@ void quicksort(int[],int, int, int[]);
 void sort(string[],int,int,int[]);
 
 int main(int argc, char** argv){
+	char fileName[20];
+	char fileIndexName[30];
+	cout<<"------------------------------------------------------------------------------------------------------------"<<endl
+			<<endl;
+	cout<<"Para comenzar ingrese el nombre del archivo con el que trabajará:";
+	cin>>fileName;
+	stringstream arch;
+	stringstream archind;
+	arch<<fileName<<".bin";
+	arch>>fileName;
+	archind<<fileName<<".index";
+	archind>>fileIndexName;
 	while(true){
 		vector<int> tipocampos;
 		vector<IndString> listaindicesstrings;
@@ -47,29 +57,26 @@ int main(int argc, char** argv){
 		int opcion;
 		int tamano;
 		int CantidadCampos;
-		char namekey[20];
-		char fileName[20];
-		char fileIndexName[30];
+		char namekey[20];		
 		string namekeyespejo;
 		char nombre[20];
 		int opcion2;
 		int tipoLlave;
-
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
-		cout<<"1)Ingresar nuevo"<<endl<<"2)Leer/Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
+		cout<<"0)Abrir archivo"<<endl<<"1)Ingresar nuevo"<<endl<<"2)Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
 			<<"9)Reindexar"<<endl<<"10)Agregar con índice"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
-			stringstream arch;
-			stringstream archind;
-			arch<<fileName<<".bin";
-			arch>>fileName;
-			archind<<fileName<<".index";
-			archind>>fileIndexName;
+			stringstream archive;
+			stringstream archiveind;
+			archive<<fileName<<".bin";
+			archive>>fileName;
+			archiveind<<fileName<<".index";
+			archiveind>>fileIndexName;
 			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
 			cin>>CantidadCampos;
 			CantidadCampos++;
@@ -285,11 +292,11 @@ int main(int argc, char** argv){
 				}
 			}
 		}else if(opcion2==2){ //Leer
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -432,14 +439,14 @@ int main(int argc, char** argv){
 
 		}else if(opcion2==3){//Append
 			char resp2;
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			stringstream archind;
 			arch<<fileName<<".bin";
 			arch>>fileName;
 			archind<<fileName<<".index";
-			archind>>fileIndexName;
+			archind>>fileIndexName;*/
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -631,11 +638,11 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==4){//Borrar
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -770,41 +777,167 @@ int main(int argc, char** argv){
 				elContador++;
 			}
 			in.close();
-			int indiceBorrado;
-			cout<<"Ingrese el RRN de el registro que desea eliminar:";
-			cin>>indiceBorrado;
-			int offset = 0;
-			offset += sizeof(int)*3;
-			offset += CantidadCampos*sizeof(char)*20;
-			offset += CantidadCampos*sizeof(int);
-			offset += CantidadCampos*sizeof(int);
-			offset += totalbuffer*indiceBorrado;
-			ifstream checker(fileName,ios::in|ios::binary);
-			checker.seekg(sizeof(int));
-			char charAvail[sizeof(int)];
-			checker.read(charAvail,sizeof(int));
-			charint tmp;
-			memcpy(tmp.raw,charAvail,sizeof(int));
-			int tmpnum = tmp.num;
-			checker.close();
-			fstream er(fileName, ios::out|ios::in|ios::binary);	
-			er.seekp(offset);
+			cout<<"1)Por Indice"<<endl<<"2)Por RRN"<<endl<<"3)Cancelar"<<endl<<"Opcion de eliminar:";
+			int opcionEliminar;
+			cin>>opcionEliminar;
 			char mark = '*';
-			er.write(reinterpret_cast<char*>(&mark),sizeof(char));
-			er.write(reinterpret_cast<char*>(&tmpnum),sizeof(int));
-			er.close();
-			cout<<"Borrado con exito!"<<endl;
-			fstream act(fileName, ios::out|ios::in|ios::binary);
-			act.seekp(sizeof(int));
-			act.write(reinterpret_cast<char*>(&indiceBorrado),sizeof(int));
-			act.close();
+			if(opcionEliminar==2){
+				int indiceBorrado;
+				cout<<"Ingrese el RRN de el registro que desea eliminar:";
+				cin>>indiceBorrado;
+				int offset = 0;
+				offset += sizeof(int)*3;
+				offset += CantidadCampos*sizeof(char)*20;
+				offset += CantidadCampos*sizeof(int);
+				offset += CantidadCampos*sizeof(int);
+				offset += totalbuffer*indiceBorrado;
+				ifstream checker(fileName,ios::in|ios::binary);
+				checker.seekg(sizeof(int));
+				char charAvail[sizeof(int)];
+				checker.read(charAvail,sizeof(int));
+				charint tmp;
+				memcpy(tmp.raw,charAvail,sizeof(int));
+				int tmpnum = tmp.num;
+				checker.close();
+				fstream er(fileName, ios::out|ios::in|ios::binary);	
+				er.seekp(offset);				
+				er.write(reinterpret_cast<char*>(&mark),sizeof(char));
+				er.write(reinterpret_cast<char*>(&tmpnum),sizeof(int));
+				er.close();
+				cout<<"Borrado con exito!"<<endl;
+				fstream act(fileName, ios::out|ios::in|ios::binary);
+				act.seekp(sizeof(int));
+				act.write(reinterpret_cast<char*>(&indiceBorrado),sizeof(int));
+				act.close();
+			}else if(opcionEliminar==1){
+				char LlaveStr[20];
+				int LlaveEntero;
+				int offset = 0;
+				offset += sizeof(int)*3;
+				offset += CantidadCampos*sizeof(char)*20;
+				offset += CantidadCampos*sizeof(int);
+				offset += CantidadCampos*sizeof(int);
+				if(tipoLlave==1){
+					cout<<"Ingrese la llave del registro que desea eliminar:";
+					cin>>LlaveStr;
+					string KeyLLaveStr = LlaveStr;
+					fstream eliminateRead(fileName,ios::in|ios::out|ios::binary);
+					eliminateRead.seekg(offset);
+					int count = 0;
+					bool encontrado = false;
+					while(eliminateRead.good()){
+
+						char bufferEl[totalbuffer];
+						eliminateRead.read(bufferEl,totalbuffer);
+						if(eliminateRead.eof()){
+							break;
+						}
+						char prueba[20];
+						memcpy(prueba,bufferEl,sizeof(char)*19);
+						prueba[19] = '\0';
+						string pruebaStr = prueba;
+						if(pruebaStr == KeyLLaveStr){
+							encontrado = true;
+							break;
+						}
+						count++;
+
+					}
+					eliminateRead.close();
+					if(encontrado){
+						ifstream lector(fileName, ios::in|ios::binary);
+						lector.seekg(sizeof(int));
+						char buffeAvail[sizeof(int)];
+						lector.read(buffeAvail,sizeof(int));
+						charint lastAvail;
+						memcpy(lastAvail.raw,buffeAvail,sizeof(int));
+						lector.close();
+						offset = 0;
+						offset += sizeof(int)*3;
+						offset += CantidadCampos*sizeof(char)*20;
+						offset += CantidadCampos*sizeof(int);
+						offset += CantidadCampos*sizeof(int);
+						offset += totalbuffer*count;
+						fstream eliminador(fileName,ios::out|ios::in|ios::binary);
+						eliminador.seekp(offset);
+						eliminador.write(reinterpret_cast<char*>(&mark),sizeof(char));
+						eliminador.write(reinterpret_cast<char*>(&lastAvail.num),sizeof(int));
+						eliminador.close();
+						fstream actualizador(fileName,ios::out|ios::in|ios::binary);
+						actualizador.seekp(sizeof(int));
+						actualizador.write(reinterpret_cast<char*>(&count),sizeof(int));
+						actualizador.close();
+						cout<<"Eliminado con éxito!"<<endl;
+					}else{
+						cout<<"Registro no encontrado"<<endl;
+					}
+				}else if(tipoLlave==3){
+					cout<<"Ingrese la llave del registro que desea eliminar:";
+					cin>>LlaveEntero;
+					fstream eliminateRead(fileName,ios::in|ios::out|ios::binary);
+					eliminateRead.seekg(offset);
+					int count = 0;
+					bool encontrado = false;
+					while(eliminateRead.good()){
+
+						char bufferEl[totalbuffer];
+						eliminateRead.read(bufferEl,totalbuffer);
+						if(eliminateRead.eof()){
+							break;
+						}
+						charint pruebaInt;
+						memcpy(pruebaInt.raw,bufferEl,sizeof(int));
+						if(pruebaInt.num == LlaveEntero){
+							encontrado = true;
+							break;
+						}
+						count++;
+
+					}
+					eliminateRead.close();
+					if(encontrado){
+						ifstream lector(fileName, ios::in|ios::binary);
+						lector.seekg(sizeof(int));
+						char buffeAvail[sizeof(int)];
+						charint lastAvail;
+						lector.read(buffeAvail,sizeof(int));
+						memcpy(lastAvail.raw,buffeAvail,sizeof(int));
+						lector.close();
+						offset = 0;
+						offset += sizeof(int)*3;
+						offset += CantidadCampos*sizeof(char)*20;
+						offset += CantidadCampos*sizeof(int);
+						offset += CantidadCampos*sizeof(int);
+						offset += totalbuffer*count;
+						fstream eliminador(fileName,ios::out|ios::in|ios::binary);
+						eliminador.seekp(offset);
+						eliminador.write(reinterpret_cast<char*>(&mark),sizeof(char));
+						eliminador.write(reinterpret_cast<char*>(&lastAvail.num),sizeof(int));
+						eliminador.close();
+						fstream actualizador(fileName,ios::out|ios::in|ios::binary);
+						actualizador.seekp(sizeof(int));
+						actualizador.write(reinterpret_cast<char*>(&count),sizeof(int));
+						actualizador.close();
+						cout<<"Eliminado con éxito!"<<endl;
+					}else{
+						cout<<"Registro no encontrado"<<endl;
+					}
+
+				}else{
+					cout<<"Registros no contienen llave!"<<endl;
+				}
+
+			}else{//cancelar eliminar
+
+			}
+			
 			//end if 4
 		}else if(opcion2==5){//buscar
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			int metodo;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
@@ -1114,14 +1247,14 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==6){//modificar
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			stringstream archind;
 			arch<<fileName<<".bin";
 			arch>>fileName;
 			archind<<fileName<<".index";
-			archind>>fileIndexName;
+			archind>>fileIndexName;*/
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -1315,11 +1448,11 @@ int main(int argc, char** argv){
 			cout<<"Modificado con exito!"<<endl;
 
 		}else if(opcion2==7){//Compactar
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary);
 			ofstream out("tmp.bin", ios::out|ios::binary);
 			tipocampos.clear();
@@ -1461,11 +1594,11 @@ int main(int argc, char** argv){
 		}else if(opcion2 == 9){//keysort
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -1959,11 +2092,11 @@ int main(int argc, char** argv){
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
 			espejoCampos.clear();
-			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream arch;
 			arch<<fileName<<".bin";
-			arch>>fileName;
+			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			ofstream out("tmp.bin",ios::out|ios::binary);
 			tipocampos.clear();
@@ -2441,8 +2574,16 @@ int main(int argc, char** argv){
 			}else{//end if key instance of string
 				cout<<"Este registro no contiene llave, utilice la opcion 3 para agregar a este archivo"<<endl;
 			}
-		}//end else if 10
-
+		}else if(opcion2==0){//end else if 10
+			cout<<"Ingrese el nombre del archivo con el que trabajará:";
+			cin>>fileName;
+			stringstream arch;
+			stringstream archind;
+			arch<<fileName<<".bin";
+			arch>>fileName;
+			archind<<fileName<<".index";
+			archind>>fileIndexName;
+		}
 
 
 	}//end while
