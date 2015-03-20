@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <unistd.h>
 using namespace std;
 
 union charint{
@@ -34,16 +35,21 @@ void sort(string[],int,int,int[]);
 int main(int argc, char** argv){
 	char fileName[20];
 	char fileIndexName[30];
-	cout<<"------------------------------------------------------------------------------------------------------------"<<endl
+	while(true){
+		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
-	cout<<"Para comenzar ingrese el nombre del archivo con el que trabajará:";
-	cin>>fileName;
-	stringstream arch;
-	stringstream archind;
-	arch<<fileName<<".bin";
-	arch>>fileName;
-	archind<<fileName<<".index";
-	archind>>fileIndexName;
+		cout<<"Para comenzar ingrese el nombre del archivo con el que trabajará:";
+		cin>>fileName;
+		stringstream arch;
+		stringstream archind;
+		arch<<fileName<<".bin";
+		arch>>fileName;
+		archind<<fileName<<".index";
+		archind>>fileIndexName;
+		if( access(fileName, F_OK) != -1){				
+			break;
+		}
+	}
 	while(true){
 		vector<int> tipocampos;
 		vector<IndString> listaindicesstrings;
@@ -1362,63 +1368,77 @@ int main(int argc, char** argv){
 				elContador++;
 			}
 			in.close();
-			int indiceModificado;
-			cout<<"Ingrese el RRN de el registro que desea modificar:";
-			cin>>indiceModificado;
-			fstream mod(fileName, ios::out|ios::in|ios::binary);
+			cout<<"1)Por Indice"<<endl<<"2)Por RRN"<<endl<<"Ingrese metodo por el cual modificará:";
+			int tipoModificacion;
+			cin>>tipoModificacion;
+			if(tipoModificacion==2){
 
-			int offset = 0;
-			offset += sizeof(int)*3;
-			offset += CantidadCampos*sizeof(char)*20;
-			offset += CantidadCampos*sizeof(int);
-			offset += CantidadCampos*sizeof(int);
-			offset += totalbuffer*indiceModificado;
-			mod.seekp(offset);
+				int indiceModificado;
+				cout<<"Ingrese el RRN de el registro que desea modificar:";
+				cin>>indiceModificado;
+				fstream mod(fileName, ios::out|ios::in|ios::binary);
+				int offset = 0;
+				offset += sizeof(int)*3;
+				offset += CantidadCampos*sizeof(char)*20;
+				offset += CantidadCampos*sizeof(int);
+				offset += CantidadCampos*sizeof(int);
+				offset += totalbuffer*indiceModificado;
+				mod.seekp(offset);
 
-			cout<<"Ingrese los datos:"<<endl;
-			for (int i = 0; i < tipocampos.size(); ++i){
-				if(tipocampos[i]==1){
-					cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
-					char cadena[sizes[i]];
-					cin>>cadena;
-					mod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
-					if(tipoLlave==1 && i==0){
-						fstream indexMod(fileIndexName, ios::out|ios::in|ios::binary);
-						indexMod.seekp(indiceModificado*20*sizeof(char));
-						indexMod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(20));
-						indexMod.close();
+				cout<<"Ingrese los datos:"<<endl;
+				for (int i = 0; i < tipocampos.size(); ++i){
+					if(tipocampos[i]==1){
+						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+						char cadena[sizes[i]];
+						cin>>cadena;
+						mod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+						if(tipoLlave==1 && i==0){
+							fstream indexMod(fileIndexName, ios::out|ios::in|ios::binary);
+							indexMod.seekp(indiceModificado*20*sizeof(char));
+							indexMod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(20));
+							indexMod.close();
+						}
+					}else if(tipocampos[i]==2){
+						cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+						char caracter;
+						cin>>caracter;
+						mod.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+					}else if(tipocampos[i]==3){
+						cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+						int entero;
+						cin>>entero;
+						mod.write(reinterpret_cast<char*>(&entero), sizeof(int));
+						if(tipoLlave==3 && i==0){
+							fstream indexModInt(fileIndexName,ios::out|ios::in|ios::binary);
+							indexModInt.seekp(indiceModificado*sizeof(int));
+							indexModInt.write(reinterpret_cast<char*>(&entero), sizeof(int));
+							indexModInt.close();
+						}
+					}else if(tipocampos[i]==5){
+						cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+						float flotante;
+						cin>>flotante;
+						mod.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+					}else{
+						cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+						double doble;
+						cin>>doble;
+						mod.write(reinterpret_cast<char*>(&doble), sizeof(double));
 					}
-				}else if(tipocampos[i]==2){
-					cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
-					char caracter;
-					cin>>caracter;
-					mod.write(reinterpret_cast<char*>(&caracter), sizeof(char));
-				}else if(tipocampos[i]==3){
-					cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
-					int entero;
-					cin>>entero;
-					mod.write(reinterpret_cast<char*>(&entero), sizeof(int));
-					if(tipoLlave==3 && i==0){
-						fstream indexModInt(fileIndexName,ios::out|ios::in|ios::binary);
-						indexModInt.seekp(indiceModificado*sizeof(int));
-						indexModInt.write(reinterpret_cast<char*>(&entero), sizeof(int));
-						indexModInt.close();
-					}
-				}else if(tipocampos[i]==5){
-					cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
-					float flotante;
-					cin>>flotante;
-					mod.write(reinterpret_cast<char*>(&flotante), sizeof(float));
-				}else{
-					cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
-					double doble;
-					cin>>doble;
-					mod.write(reinterpret_cast<char*>(&doble), sizeof(double));
+				}
+
+				mod.close();
+				cout<<"Modificado con exito!"<<endl;
+			}else if(tipoModificacion==1){
+				if(tipoLlave==1){
+
+
+
+				}else if(tipoLlave==3){
+
 				}
 			}
-
-			mod.close();
-			cout<<"Modificado con exito!"<<endl;
+			
 
 		}else if(opcion2==7){//Compactar
 
@@ -2534,14 +2554,22 @@ int main(int argc, char** argv){
 				cout<<"Este registro no contiene llave, utilice la opcion 3 para agregar a este archivo"<<endl;
 			}
 		}else if(opcion2==0){//end else if 10
-			cout<<"Ingrese el nombre del archivo con el que trabajará:";
-			cin>>fileName;
-			stringstream arch;
-			stringstream archind;
-			arch<<fileName<<".bin";
-			arch>>fileName;
-			archind<<fileName<<".index";
-			archind>>fileIndexName;
+			while(true){
+				cout<<"Ingrese el nombre del archivo con el que trabajará:";
+				cin>>fileName;
+				stringstream arch;
+				stringstream archind;
+				arch<<fileName<<".bin";
+				arch>>fileName;
+				archind<<fileName<<".index";
+				archind>>fileIndexName;
+				if( access(fileName, F_OK) != -1){				
+					break;
+				}else{
+
+				}
+			}
+			
 		}
 
 
