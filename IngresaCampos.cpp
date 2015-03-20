@@ -66,7 +66,7 @@ int main(int argc, char** argv){
 			<<endl;
 		cout<<"0)Abrir archivo"<<endl<<"1)Ingresar nuevo"<<endl<<"2)Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
-			<<"9)Reindexar"<<endl<<"10)Agregar con índice"<<endl<<"Ingrese el codigo de lo que desea hacer:";
+			<<"9)Reindexar"<<endl<<"10)Agregar con índice"<<endl<<"11)Cruzar archivos"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
@@ -292,11 +292,7 @@ int main(int argc, char** argv){
 				}
 			}
 		}else if(opcion2==2){ //Leer
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
+
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -439,14 +435,6 @@ int main(int argc, char** argv){
 
 		}else if(opcion2==3){//Append
 			char resp2;
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			stringstream archind;
-			arch<<fileName<<".bin";
-			arch>>fileName;
-			archind<<fileName<<".index";
-			archind>>fileIndexName;*/
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -638,11 +626,7 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==4){//Borrar
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
+
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -933,11 +917,7 @@ int main(int argc, char** argv){
 			
 			//end if 4
 		}else if(opcion2==5){//buscar
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
+
 			int metodo;
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
@@ -1247,14 +1227,7 @@ int main(int argc, char** argv){
 
 
 		}else if(opcion2==6){//modificar
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			stringstream archind;
-			arch<<fileName<<".bin";
-			arch>>fileName;
-			archind<<fileName<<".index";
-			archind>>fileIndexName;*/
+
 			ifstream in(fileName, ios::in|ios::binary);
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -1448,11 +1421,7 @@ int main(int argc, char** argv){
 			cout<<"Modificado con exito!"<<endl;
 
 		}else if(opcion2==7){//Compactar
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
+
 			ifstream in(fileName, ios::in|ios::binary);
 			ofstream out("tmp.bin", ios::out|ios::binary);
 			tipocampos.clear();
@@ -1591,14 +1560,9 @@ int main(int argc, char** argv){
 		}else if(opcion2 == 8){
 			break;
 
-		}else if(opcion2 == 9){//keysort
+		}else if(opcion2 == 9){//Reindexar
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
@@ -2092,11 +2056,6 @@ int main(int argc, char** argv){
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
 			espejoCampos.clear();
-			/*cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
-			cin>>fileName;
-			stringstream arch;
-			arch<<fileName<<".bin";
-			arch>>fileName;*/
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			ofstream out("tmp.bin",ios::out|ios::binary);
 			tipocampos.clear();
