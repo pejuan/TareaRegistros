@@ -1089,11 +1089,6 @@ int main(int argc, char** argv){
 					cin>>llaveFloat;
 					tamanoDato = sizeof(float);
 				}
-				////////////////////////////////////////////////////////////////////////////////////////
-
-				////////////////////////////////////////////////////////////////////////////////////////
-
-				////////////////////////////////////////////////////////////////////////////////////////
 				int offset = 0;
 				offset += sizeof(int)*3;
 				offset += CantidadCampos*sizeof(char)*20;
@@ -1430,13 +1425,191 @@ int main(int argc, char** argv){
 				mod.close();
 				cout<<"Modificado con exito!"<<endl;
 			}else if(tipoModificacion==1){
+				char LlaveStr[20];
+				int LlaveEntero;
+				int offset = 0;
+				offset += sizeof(int)*3;
+				offset += CantidadCampos*sizeof(char)*20;
+				offset += CantidadCampos*sizeof(int);
+				offset += CantidadCampos*sizeof(int);
 				if(tipoLlave==1){
+					cout<<"Ingrese la llave del registro que desea modificar:";
+					cin>>LlaveStr;
+					string KeyLLaveStr = LlaveStr;
+					fstream modifyRead(fileName,ios::in|ios::out|ios::binary);
+					modifyRead.seekg(offset);
+					int count = 0;
+					bool encontrado = false;
+					while(modifyRead.good()){
 
+						char bufferEl[totalbuffer];
+						modifyRead.read(bufferEl,totalbuffer);
+						if(modifyRead.eof()){
+							break;
+						}
+						char prueba[20];
+						memcpy(prueba,bufferEl,sizeof(char)*19);
+						prueba[19] = '\0';
+						string pruebaStr = prueba;
+						if(pruebaStr == KeyLLaveStr){
+							encontrado = true;
+							break;
+						}
+						count++;
+
+					}
+					modifyRead.close();
+					if(encontrado){
+						ifstream lector(fileName, ios::in|ios::binary);
+						lector.seekg(sizeof(int));
+						char buffeAvail[sizeof(int)];
+						lector.read(buffeAvail,sizeof(int));
+						charint lastAvail;
+						memcpy(lastAvail.raw,buffeAvail,sizeof(int));
+						lector.close();
+						offset = 0;
+						offset += sizeof(int)*3;
+						offset += CantidadCampos*sizeof(char)*20;
+						offset += CantidadCampos*sizeof(int);
+						offset += CantidadCampos*sizeof(int);
+						offset += totalbuffer*count;
+						fstream mod(fileName,ios::out|ios::in|ios::binary);
+						mod.seekp(offset);
+						cout<<"Ingrese los datos:"<<endl;
+						for (int i = 0; i < tipocampos.size(); ++i){
+							if(tipocampos[i]==1){
+								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+								char cadena[sizes[i]];
+								cin>>cadena;
+								mod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+								if(tipoLlave==1 && i==0){
+									fstream indexMod(fileIndexName, ios::out|ios::in|ios::binary);
+									indexMod.seekp(count*20*sizeof(char));
+									indexMod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(20));
+									indexMod.close();
+								}
+							}else if(tipocampos[i]==2){
+								cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+								char caracter;
+								cin>>caracter;
+								mod.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+							}else if(tipocampos[i]==3){
+								cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+								int entero;
+								cin>>entero;
+								mod.write(reinterpret_cast<char*>(&entero), sizeof(int));
+								if(tipoLlave==3 && i==0){
+									fstream indexModInt(fileIndexName,ios::out|ios::in|ios::binary);
+									indexModInt.seekp(count*sizeof(int));
+									indexModInt.write(reinterpret_cast<char*>(&entero), sizeof(int));
+									indexModInt.close();
+								}
+							}else if(tipocampos[i]==5){
+								cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+								float flotante;
+								cin>>flotante;
+								mod.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+							}else{
+								cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+								double doble;
+								cin>>doble;
+								mod.write(reinterpret_cast<char*>(&doble), sizeof(double));
+							}
+						}		
+						mod.close();
+						cout<<"Modificado con éxito!"<<endl;
+					}else{
+						cout<<"Registro no encontrado"<<endl;
+					}
 
 
 				}else if(tipoLlave==3){
 
-				}
+					cout<<"Ingrese la llave del registro que desea eliminar:";
+					cin>>LlaveEntero;
+					fstream modifyRead(fileName,ios::in|ios::out|ios::binary);
+					modifyRead.seekg(offset);
+					int count = 0;
+					bool encontrado = false;
+					while(modifyRead.good()){
+
+						char bufferEl[totalbuffer];
+						modifyRead.read(bufferEl,totalbuffer);
+						if(modifyRead.eof()){
+							break;
+						}
+						charint pruebaInt;
+						memcpy(pruebaInt.raw,bufferEl,sizeof(int));
+						if(pruebaInt.num == LlaveEntero){
+							encontrado = true;
+							break;
+						}
+						count++;
+					}
+					modifyRead.close();
+					if(encontrado){
+						ifstream lector(fileName, ios::in|ios::binary);
+						lector.seekg(sizeof(int));
+						char buffeAvail[sizeof(int)];
+						lector.read(buffeAvail,sizeof(int));
+						charint lastAvail;
+						memcpy(lastAvail.raw,buffeAvail,sizeof(int));
+						lector.close();
+						offset = 0;
+						offset += sizeof(int)*3;
+						offset += CantidadCampos*sizeof(char)*20;
+						offset += CantidadCampos*sizeof(int);
+						offset += CantidadCampos*sizeof(int);
+						offset += totalbuffer*count;
+						fstream mod(fileName,ios::out|ios::in|ios::binary);
+						mod.seekp(offset);
+						cout<<"Ingrese los datos:"<<endl;
+						for (int i = 0; i < tipocampos.size(); ++i){
+							if(tipocampos[i]==1){
+								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<endl;
+								char cadena[sizes[i]];
+								cin>>cadena;
+								mod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(sizes[i]));////aqui quitar el -1
+								if(tipoLlave==1 && i==0){
+									fstream indexMod(fileIndexName, ios::out|ios::in|ios::binary);
+									indexMod.seekp(count*20*sizeof(char));
+									indexMod.write(reinterpret_cast<char*>(&cadena), sizeof(char)*(20));
+									indexMod.close();
+								}
+							}else if(tipocampos[i]==2){
+								cout<<"Ingrese el caracter perteneciente al campo "<<espejoCampos[i]<<endl;
+								char caracter;
+								cin>>caracter;
+								mod.write(reinterpret_cast<char*>(&caracter), sizeof(char));
+							}else if(tipocampos[i]==3){
+								cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<endl;
+								int entero;
+								cin>>entero;
+								mod.write(reinterpret_cast<char*>(&entero), sizeof(int));
+								if(tipoLlave==3 && i==0){
+									fstream indexModInt(fileIndexName,ios::out|ios::in|ios::binary);
+									indexModInt.seekp(count*sizeof(int));
+									indexModInt.write(reinterpret_cast<char*>(&entero), sizeof(int));
+									indexModInt.close();
+								}
+							}else if(tipocampos[i]==5){
+								cout<<"Ingrese el float perteneciente al campo "<<espejoCampos[i]<<endl;
+								float flotante;
+								cin>>flotante;
+								mod.write(reinterpret_cast<char*>(&flotante), sizeof(float));
+							}else{
+								cout<<"Ingrese el double perteneciente al campo "<<espejoCampos[i]<<endl;
+								double doble;
+								cin>>doble;
+								mod.write(reinterpret_cast<char*>(&doble), sizeof(double));
+							}
+						}		
+						mod.close();
+						cout<<"Modificado con éxito!"<<endl;
+					}else{
+						cout<<"Registro no encontrado"<<endl;
+					}
+				}//end tipoLlave=3 es decir entero
 			}
 			
 
