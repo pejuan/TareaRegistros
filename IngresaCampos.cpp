@@ -2886,24 +2886,16 @@ int main(int argc, char** argv){
 				stringstream theName;
 				
 				for (int i = 0; i < camposUsadosPrimero.size(); i++){
-					//theName.str("");
 					string theFirst = espejosPrim[camposUsadosPrimero[i]];
 					char nuevoNombre[20];
 					strcpy(nuevoNombre,theFirst.c_str());
-					//theName<<espejosPrim[camposUsadosPrimero[i]];
-					//theName>>nuevoNombre;
-					//out.write(reinterpret_cast<char*>(&nombreCamposPrim[camposUsadosPrimero[i]]),sizeof(char)*20);
 					cout<<nuevoNombre<<endl;
 					out.write(reinterpret_cast<char*>(&nuevoNombre),sizeof(char)*20);
 				}
 				for (int i = 0; i < camposUsadosSegundo.size(); i++){
-					//theName.str("");
 					string theSecond = espejosSecu[camposUsadosSegundo[i]];
 					char nuevoNombre2[20];
 					strcpy(nuevoNombre2,theSecond.c_str());
-					//theName<<espejosSecu[camposUsadosSegundo[i]];
-					//theName>>nuevoNombre2;
-					//out.write(reinterpret_cast<char*>(&nombreCamposSecu[camposUsadosSegundo[i]]),sizeof(char)*20);
 					cout<<nuevoNombre2<<endl;
 					out.write(reinterpret_cast<char*>(&nuevoNombre2),sizeof(char)*20);
 				}
