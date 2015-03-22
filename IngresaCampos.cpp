@@ -2889,14 +2889,12 @@ int main(int argc, char** argv){
 					string theFirst = espejosPrim[camposUsadosPrimero[i]];
 					char nuevoNombre[20];
 					strcpy(nuevoNombre,theFirst.c_str());
-					cout<<nuevoNombre<<endl;
 					out.write(reinterpret_cast<char*>(&nuevoNombre),sizeof(char)*20);
 				}
 				for (int i = 0; i < camposUsadosSegundo.size(); i++){
 					string theSecond = espejosSecu[camposUsadosSegundo[i]];
 					char nuevoNombre2[20];
 					strcpy(nuevoNombre2,theSecond.c_str());
-					cout<<nuevoNombre2<<endl;
 					out.write(reinterpret_cast<char*>(&nuevoNombre2),sizeof(char)*20);
 				}
 				for (int i = 0; i < camposUsadosPrimero.size(); i++){
@@ -3018,6 +3016,7 @@ int main(int argc, char** argv){
 				out.close();
 				lectorPrim.close();
 				lectorSecu.close();
+				cout<<"Archivos cruzados con éxito!"<<endl;
 			}else if(opcionCruz==2){
 
 			}else{
