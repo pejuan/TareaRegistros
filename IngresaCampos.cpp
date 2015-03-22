@@ -2872,7 +2872,7 @@ int main(int argc, char** argv){
 						cout<<"Hubo clavo"<<endl;
 					}
 				}
-				int CantidadCampos = cantindadCamposPrimero.num+cantidadCamposSegundo.num;
+				int CantidadCampos = camposUsadosPrimero.size()+camposUsadosSegundo.size();
 				int menosuno = -1;
 				int cero = 0;
 				fstream out(nuevoArchivo, ios::out|ios::binary);
