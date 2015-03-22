@@ -33,7 +33,7 @@ void quicksort(int[],int, int, int[]);
 void sort(string[],int,int,int[]);
 
 int main(int argc, char** argv){
-	char fileName[20];
+	char fileName[30];
 	char fileIndexName[30];
 	while(true){
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
@@ -2743,7 +2743,277 @@ int main(int argc, char** argv){
 				}
 			}
 			
-		}
+		}else if(opcion2==11){//cruzar
+
+			char archivo1[20];
+			char archivo2[20];
+			stringstream first, second;
+			cout<<"Ingrese el nombre del primer archivo:";
+			cin>>archivo1;
+			cout<<"Ingrese el nombre del segundo archivo:";
+			cin>>archivo2;
+			first<<archivo1<<".bin";
+			second<<archivo2<<".bin";
+			first>>archivo1;
+			second>>archivo2;
+			cout<<"1)Sin indice"<<endl<<"2)Con indice"<<endl<<"Ingrese tipo de cruzamiento:";
+			int opcionCruz;
+			cin>>opcionCruz;
+			charint cantindadCamposPrimero;
+			charint cantidadCamposSegundo;
+			vector<int> camposUsadosPrimero;
+			vector<int> tiposPrimero;
+			vector<int> tiposSegundo;
+			vector<int> camposUsadosSegundo;
+			vector<int> sizesPrimero;
+			vector<int> sizesSegundo;
+			int rrn;
+			string espejoName;
+			if(opcionCruz==1){
+				cout<<"Ingrese el nombre del archivo nuevo:";
+				char nuevoArchivo[30];
+				cin>>nuevoArchivo;
+				stringstream strstrm;
+				strstrm<<nuevoArchivo<<".bin";
+				strstrm>>nuevoArchivo;
+				ifstream lectorPrim(archivo1, ios::in|ios::binary);
+				char buffer[sizeof(int)*3];
+				lectorPrim.read(buffer, sizeof(int)*3);
+				memcpy(cantindadCamposPrimero.raw,buffer,sizeof(int));
+				char bufferNames[20];
+				vector<char*> nombreCamposPrim;
+				vector<char*> nombreCamposSecu;
+				cout<<"Campos del primer archivo:"<<endl;
+				for (int i = 0; i < cantindadCamposPrimero.num; i++){
+					lectorPrim.read(bufferNames,sizeof(char)*20);
+					espejoName = bufferNames;
+					nombreCamposPrim.push_back(bufferNames);
+					cout<<i<<")"<<espejoName<<endl;
+				}
+				cout<<"Ingrese el numero de los campos que desea utilizar (-1 para salir):"<<endl;
+				while(true){
+					cin>>rrn;
+					if(rrn < 0){
+						break;
+					}else if(rrn < cantindadCamposPrimero.num){
+						camposUsadosPrimero.push_back(rrn);
+					}
+				}
+				ifstream lectorSecu(archivo2, ios::in|ios::binary);
+				lectorSecu.read(buffer, sizeof(int)*3);
+				memcpy(cantidadCamposSegundo.raw,buffer,sizeof(int));
+				cout<<"Campos del segundo archivo:"<<endl;
+				for (int i = 0; i < cantidadCamposSegundo.num; i++){
+					lectorSecu.read(bufferNames,sizeof(char)*20);
+					espejoName = bufferNames;
+					nombreCamposSecu.push_back(bufferNames);
+					cout<<i<<")"<<espejoName<<endl;
+				}
+				cout<<"Ingrese el numero de los campos que desea utilizar (-1 para salir):"<<endl;
+				while(true){
+					cin>>rrn;
+					if(rrn < 0){
+						break;
+					}else if(rrn < cantidadCamposSegundo.num){
+						camposUsadosSegundo.push_back(rrn);
+					}
+				}
+				char buffInt[sizeof(int)];
+				charint numeroUniversal;
+				for (int i = 0; i < cantindadCamposPrimero.num; i++){
+					lectorPrim.read(buffInt,sizeof(int));
+					memcpy(numeroUniversal.raw,buffInt,sizeof(int));
+					tiposPrimero.push_back(numeroUniversal.num);
+				}
+				for (int i = 0; i < cantidadCamposSegundo.num; i++){
+					lectorSecu.read(buffInt,sizeof(int));
+					memcpy(numeroUniversal.raw,buffInt,sizeof(int));
+					tiposSegundo.push_back(numeroUniversal.num);
+				}
+				for (int i = 0; i < cantindadCamposPrimero.num; i++){
+					lectorPrim.read(buffInt,sizeof(int));
+					memcpy(numeroUniversal.raw,buffInt,sizeof(int));
+					sizesPrimero.push_back(numeroUniversal.num);
+				}
+				for (int i = 0; i < cantidadCamposSegundo.num; i++){
+					lectorSecu.read(buffInt,sizeof(int));
+					memcpy(numeroUniversal.raw,buffInt,sizeof(int));
+					sizesSegundo.push_back(numeroUniversal.num);
+				}
+				int totalbufferPrim = 0;
+				for (int i = 0; i < cantindadCamposPrimero.num; i++){
+					if(tiposPrimero[i]==1){
+						totalbufferPrim += sizesPrimero[i];
+					}else if(tiposPrimero[i]==2){
+						totalbufferPrim += sizeof(char);
+					}else if(tiposPrimero[i]==3){
+						totalbufferPrim += sizeof(int);
+					}else if(tiposPrimero[i]==4){
+						totalbufferPrim += sizeof(double);
+					}else if(tiposPrimero[i]==5){
+						totalbufferPrim += sizeof(float);
+					}else{
+						cout<<"Hubo clavo"<<endl;
+					}
+				}
+				int totalbufferSecu = 0;
+				for (int i = 0; i < cantidadCamposSegundo.num; i++){
+					if(tiposSegundo[i]==1){
+						totalbufferSecu += sizesSegundo[i];
+					}else if(tiposSegundo[i]==2){
+						totalbufferSecu += sizeof(char);
+					}else if(tiposSegundo[i]==3){
+						totalbufferSecu += sizeof(int);
+					}else if(tiposSegundo[i]==4){
+						totalbufferSecu += sizeof(double);
+					}else if(tiposSegundo[i]==5){
+						totalbufferSecu += sizeof(float);
+					}else{
+						cout<<"Hubo clavo"<<endl;
+					}
+				}
+				int CantidadCampos = cantindadCamposPrimero.num+cantidadCamposSegundo.num;
+				int menosuno = -1;
+				int cero = 0;
+				fstream out(nuevoArchivo, ios::out|ios::binary);
+				out.write(reinterpret_cast<char*>(&CantidadCampos),sizeof(int));
+				out.write(reinterpret_cast<char*>(&menosuno),sizeof(int));
+				out.write(reinterpret_cast<char*>(&cero),sizeof(int));
+				for (int i = 0; i < camposUsadosPrimero.size(); i++){
+					out.write(reinterpret_cast<char*>(&nombreCamposPrim[camposUsadosPrimero[i]]),sizeof(char)*20);
+				}
+				for (int i = 0; i < camposUsadosSegundo.size(); i++){
+					out.write(reinterpret_cast<char*>(&nombreCamposSecu[camposUsadosSegundo[i]]),sizeof(char)*20);
+				}
+				for (int i = 0; i < camposUsadosPrimero.size(); i++){
+					out.write(reinterpret_cast<char*>(&tiposPrimero[camposUsadosPrimero[i]]),sizeof(int));
+				}
+				for (int i = 0; i < camposUsadosSegundo.size(); i++){
+					out.write(reinterpret_cast<char*>(&tiposSegundo[camposUsadosSegundo[i]]),sizeof(int));
+				}
+				for (int i = 0; i < camposUsadosPrimero.size(); i++){
+					out.write(reinterpret_cast<char*>(&sizesPrimero[camposUsadosPrimero[i]]),sizeof(int));
+				}
+				for (int i = 0; i < camposUsadosSegundo.size(); i++){
+					out.write(reinterpret_cast<char*>(&sizesSegundo[camposUsadosSegundo[i]]),sizeof(int));
+				}
+				char bufferPrim[totalbufferPrim];
+				char bufferSecu[totalbufferSecu];
+				vector<int> offPrim;
+				vector<int> offSecu;
+				int number = 0;
+				for (int i = 0; i < camposUsadosPrimero.size(); i++){
+					number = 0;
+					for (int j = 0; j < camposUsadosPrimero[i]; j++){
+						if(tiposPrimero[i]==1){
+							number += sizesPrimero[i];
+						}else if(tiposPrimero[i]==2){
+							number += sizeof(char);
+						}else if(tiposPrimero[i]==3){
+							number += sizeof(int);
+						}else if(tiposPrimero[i]==4){
+							number += sizeof(double);
+						}else if(tiposPrimero[i]==5){
+							number += sizeof(float);
+						}else{
+							cout<<"Hubo clavo"<<endl;
+						}
+					}
+					offPrim.push_back(number);
+				}
+				for (int i = 0; i < camposUsadosSegundo.size(); i++){
+					number = 0;
+					for (int j = 0; j < camposUsadosSegundo[i]; j++){
+						if(tiposSegundo[i]==1){
+							number += sizesPrimero[i];
+						}else if(tiposSegundo[i]==2){
+							number += sizeof(char);
+						}else if(tiposSegundo[i]==3){
+							number += sizeof(int);
+						}else if(tiposSegundo[i]==4){
+							number += sizeof(double);
+						}else if(tiposSegundo[i]==5){
+							number += sizeof(float);
+						}else{
+							cout<<"Hubo clavo"<<endl;
+						}
+					}
+					offSecu.push_back(number);
+				}
+				while(lectorPrim.good() && lectorSecu.good()){
+					lectorPrim.read(bufferPrim,totalbufferPrim);
+					lectorSecu.read(bufferSecu,totalbufferSecu);
+					if(lectorPrim.eof()){
+						break;
+					}
+					if(lectorSecu.eof()){
+						break;
+					}
+					for (int i = 0; i < camposUsadosPrimero.size(); i++){
+						if(tiposPrimero[camposUsadosPrimero[i]]==1){
+							char newStr[sizesPrimero[camposUsadosPrimero[1]]];
+							memcpy(newStr,bufferPrim+offPrim[i],sizeof(char)*(sizesPrimero[i]-1));
+							newStr[sizesPrimero[i]-1] = '\0';
+							out.write(reinterpret_cast<char*>(&newStr),sizeof(char)*sizesPrimero[i]);
+						}else if(tiposPrimero[camposUsadosPrimero[i]]==2){
+							char newchar[2];
+							memcpy(newchar,bufferPrim+offPrim[i],sizeof(char));
+							newchar[1] = '\0';
+							out.write(reinterpret_cast<char*>(&newchar),sizeof(char));
+						}else if(tiposPrimero[camposUsadosPrimero[i]]==3){
+							charint nuevoInt;
+							memcpy(nuevoInt.raw,bufferPrim+offPrim[i],sizeof(int));
+							out.write(reinterpret_cast<char*>(&nuevoInt.num),sizeof(int));
+						}else if(tiposPrimero[camposUsadosPrimero[i]]==4){
+							chardouble nuevoDouble;
+							memcpy(nuevoDouble.raw,bufferPrim+offPrim[i],sizeof(double));
+							out.write(reinterpret_cast<char*>(&nuevoDouble.num),sizeof(double));
+						}else if(tiposPrimero[camposUsadosPrimero[i]]==5){
+							charfloat nuevoFloat;
+							memcpy(nuevoFloat.raw,buffer+offPrim[i],sizeof(float));
+							out.write(reinterpret_cast<char*>(&nuevoFloat.num),sizeof(float));
+						}
+					}
+					for (int i = 0; i < camposUsadosSegundo.size(); i++){
+						if(tiposSegundo[camposUsadosSegundo[i]]==1){
+							char newStr1[sizesSegundo[camposUsadosSegundo[1]]];
+							memcpy(newStr1,bufferSecu+offSecu[i],sizeof(char)*(sizesSegundo[i]-1));
+							newStr1[sizesSegundo[i]-1] = '\0';
+							out.write(reinterpret_cast<char*>(&newStr1),sizeof(char)*sizesSegundo[i]);
+						}else if(tiposSegundo[camposUsadosSegundo[i]]==2){
+							char newchar1[2];
+							memcpy(newchar1,bufferSecu+offSecu[i],sizeof(char));
+							newchar1[1] = '\0';
+							out.write(reinterpret_cast<char*>(&newchar1),sizeof(char));
+						}else if(tiposSegundo[camposUsadosSegundo[i]]==3){
+							charint nuevoInt1;
+							memcpy(nuevoInt1.raw,bufferSecu+offSecu[i],sizeof(int));
+							out.write(reinterpret_cast<char*>(&nuevoInt1.num),sizeof(int));
+						}else if(tiposSegundo[camposUsadosSegundo[i]]==4){
+							chardouble nuevoDouble1;
+							memcpy(nuevoDouble1.raw,bufferSecu+offSecu[i],sizeof(double));
+							out.write(reinterpret_cast<char*>(&nuevoDouble1.num),sizeof(double));
+						}else if(tiposSegundo[camposUsadosSegundo[i]]==5){
+							charfloat nuevoFloat1;
+							memcpy(nuevoFloat1.raw,buffer+offSecu[i],sizeof(float));
+							out.write(reinterpret_cast<char*>(&nuevoFloat1.num),sizeof(float));
+						}
+					}
+
+				}
+				out.close();
+				lectorPrim.close();
+				lectorSecu.close();
+			}else if(opcionCruz==2){
+
+			}else{
+				cout<<"Opcion no valida!"<<endl;
+			}
+
+
+
+
+		}//end cruzar
 
 
 	}//end while
