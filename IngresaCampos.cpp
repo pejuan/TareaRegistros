@@ -2782,12 +2782,15 @@ int main(int argc, char** argv){
 				memcpy(cantindadCamposPrimero.raw,buffer,sizeof(int));
 				char bufferNames[20];
 				vector<char*> nombreCamposPrim;
+				vector<string> espejosPrim;
 				vector<char*> nombreCamposSecu;
+				vector<string> espejosSecu;
 				cout<<"Campos del primer archivo:"<<endl;
 				for (int i = 0; i < cantindadCamposPrimero.num; i++){
 					lectorPrim.read(bufferNames,sizeof(char)*20);
 					espejoName = bufferNames;
 					nombreCamposPrim.push_back(bufferNames);
+					espejosPrim.push_back(bufferNames);
 					cout<<i<<")"<<espejoName<<endl;
 				}
 				cout<<"Ingrese el numero de los campos que desea utilizar (-1 para salir):"<<endl;
@@ -2807,6 +2810,7 @@ int main(int argc, char** argv){
 					lectorSecu.read(bufferNames,sizeof(char)*20);
 					espejoName = bufferNames;
 					nombreCamposSecu.push_back(bufferNames);
+					espejosSecu.push_back(bufferNames);
 					cout<<i<<")"<<espejoName<<endl;
 				}
 				cout<<"Ingrese el numero de los campos que desea utilizar (-1 para salir):"<<endl;
@@ -2879,11 +2883,29 @@ int main(int argc, char** argv){
 				out.write(reinterpret_cast<char*>(&CantidadCampos),sizeof(int));
 				out.write(reinterpret_cast<char*>(&menosuno),sizeof(int));
 				out.write(reinterpret_cast<char*>(&cero),sizeof(int));
+				stringstream theName;
+				
 				for (int i = 0; i < camposUsadosPrimero.size(); i++){
-					out.write(reinterpret_cast<char*>(&nombreCamposPrim[camposUsadosPrimero[i]]),sizeof(char)*20);
+					//theName.str("");
+					string theFirst = espejosPrim[camposUsadosPrimero[i]];
+					char nuevoNombre[20];
+					strcpy(nuevoNombre,theFirst.c_str());
+					//theName<<espejosPrim[camposUsadosPrimero[i]];
+					//theName>>nuevoNombre;
+					//out.write(reinterpret_cast<char*>(&nombreCamposPrim[camposUsadosPrimero[i]]),sizeof(char)*20);
+					cout<<nuevoNombre<<endl;
+					out.write(reinterpret_cast<char*>(&nuevoNombre),sizeof(char)*20);
 				}
 				for (int i = 0; i < camposUsadosSegundo.size(); i++){
-					out.write(reinterpret_cast<char*>(&nombreCamposSecu[camposUsadosSegundo[i]]),sizeof(char)*20);
+					//theName.str("");
+					string theSecond = espejosSecu[camposUsadosSegundo[i]];
+					char nuevoNombre2[20];
+					strcpy(nuevoNombre2,theSecond.c_str());
+					//theName<<espejosSecu[camposUsadosSegundo[i]];
+					//theName>>nuevoNombre2;
+					//out.write(reinterpret_cast<char*>(&nombreCamposSecu[camposUsadosSegundo[i]]),sizeof(char)*20);
+					cout<<nuevoNombre2<<endl;
+					out.write(reinterpret_cast<char*>(&nuevoNombre2),sizeof(char)*20);
 				}
 				for (int i = 0; i < camposUsadosPrimero.size(); i++){
 					out.write(reinterpret_cast<char*>(&tiposPrimero[camposUsadosPrimero[i]]),sizeof(int));
