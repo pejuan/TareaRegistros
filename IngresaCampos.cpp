@@ -333,9 +333,11 @@ int main(int argc, char** argv){
 			for (int i = 0; i < CantidadCampos; ++i){
 				memcpy(CI.raw,BufferTipo+progreso,sizeof(int));
 				tipocampos.push_back(CI.num);
+				cout<<CI.num<<" ";
 				progreso += sizeof(int);
 			}
 			/////////
+			cout<<endl;
 			char BufferSizes[CantidadCampos*sizeof(int)];
 			charint elSize;
 			in.read(BufferSizes,CantidadCampos*sizeof(int));
@@ -343,9 +345,10 @@ int main(int argc, char** argv){
 			for (int i = 0; i < CantidadCampos; ++i){
 				memcpy(elSize.raw,BufferSizes+progreso,sizeof(int));
 				sizes.push_back(elSize.num);
+				cout<<elSize.num<<" ";
 				progreso += sizeof(int);
 			}
-
+			cout<<endl;
 			///////////////////////////
 			int totalbuffer = 0;
 			vector<int> tamanosreales;
@@ -2917,15 +2920,15 @@ int main(int argc, char** argv){
 				for (int i = 0; i < camposUsadosPrimero.size(); i++){
 					number = 0;
 					for (int j = 0; j < camposUsadosPrimero[i]; j++){
-						if(tiposPrimero[i]==1){
-							number += sizesPrimero[i];
-						}else if(tiposPrimero[i]==2){
+						if(tiposPrimero[j]==1){
+							number += sizesPrimero[j];
+						}else if(tiposPrimero[j]==2){
 							number += sizeof(char);
-						}else if(tiposPrimero[i]==3){
+						}else if(tiposPrimero[j]==3){
 							number += sizeof(int);
-						}else if(tiposPrimero[i]==4){
+						}else if(tiposPrimero[j]==4){
 							number += sizeof(double);
-						}else if(tiposPrimero[i]==5){
+						}else if(tiposPrimero[j]==5){
 							number += sizeof(float);
 						}else{
 							cout<<"Hubo clavo"<<endl;
@@ -2936,15 +2939,15 @@ int main(int argc, char** argv){
 				for (int i = 0; i < camposUsadosSegundo.size(); i++){
 					number = 0;
 					for (int j = 0; j < camposUsadosSegundo[i]; j++){
-						if(tiposSegundo[i]==1){
-							number += sizesPrimero[i];
-						}else if(tiposSegundo[i]==2){
+						if(tiposSegundo[j]==1){
+							number += sizesSegundo[j];
+						}else if(tiposSegundo[j]==2){
 							number += sizeof(char);
-						}else if(tiposSegundo[i]==3){
+						}else if(tiposSegundo[j]==3){
 							number += sizeof(int);
-						}else if(tiposSegundo[i]==4){
+						}else if(tiposSegundo[j]==4){
 							number += sizeof(double);
-						}else if(tiposSegundo[i]==5){
+						}else if(tiposSegundo[j]==5){
 							number += sizeof(float);
 						}else{
 							cout<<"Hubo clavo"<<endl;
@@ -2963,10 +2966,10 @@ int main(int argc, char** argv){
 					}
 					for (int i = 0; i < camposUsadosPrimero.size(); i++){
 						if(tiposPrimero[camposUsadosPrimero[i]]==1){
-							char newStr[sizesPrimero[camposUsadosPrimero[1]]];
-							memcpy(newStr,bufferPrim+offPrim[i],sizeof(char)*(sizesPrimero[i]-1));
-							newStr[sizesPrimero[i]-1] = '\0';
-							out.write(reinterpret_cast<char*>(&newStr),sizeof(char)*sizesPrimero[i]);
+							char newStr[sizesPrimero[camposUsadosPrimero[i]]];
+							memcpy(newStr,bufferPrim+offPrim[i],sizeof(char)*(sizesPrimero[camposUsadosPrimero[i]]-1));
+							newStr[sizesPrimero[camposUsadosPrimero[i]]-1] = '\0';
+							out.write(reinterpret_cast<char*>(&newStr),sizeof(char)*sizesPrimero[camposUsadosPrimero[i]]);
 						}else if(tiposPrimero[camposUsadosPrimero[i]]==2){
 							char newchar[2];
 							memcpy(newchar,bufferPrim+offPrim[i],sizeof(char));
@@ -2982,16 +2985,16 @@ int main(int argc, char** argv){
 							out.write(reinterpret_cast<char*>(&nuevoDouble.num),sizeof(double));
 						}else if(tiposPrimero[camposUsadosPrimero[i]]==5){
 							charfloat nuevoFloat;
-							memcpy(nuevoFloat.raw,buffer+offPrim[i],sizeof(float));
+							memcpy(nuevoFloat.raw,bufferPrim+offPrim[i],sizeof(float));
 							out.write(reinterpret_cast<char*>(&nuevoFloat.num),sizeof(float));
 						}
 					}
 					for (int i = 0; i < camposUsadosSegundo.size(); i++){
 						if(tiposSegundo[camposUsadosSegundo[i]]==1){
-							char newStr1[sizesSegundo[camposUsadosSegundo[1]]];
-							memcpy(newStr1,bufferSecu+offSecu[i],sizeof(char)*(sizesSegundo[i]-1));
-							newStr1[sizesSegundo[i]-1] = '\0';
-							out.write(reinterpret_cast<char*>(&newStr1),sizeof(char)*sizesSegundo[i]);
+							char newStr1[sizesSegundo[camposUsadosSegundo[i]]];
+							memcpy(newStr1,bufferSecu+offSecu[i],sizeof(char)*(sizesSegundo[camposUsadosSegundo[i]]-1));
+							newStr1[sizesSegundo[camposUsadosSegundo[i]]-1] = '\0';
+							out.write(reinterpret_cast<char*>(&newStr1),sizeof(char)*sizesSegundo[camposUsadosSegundo[i]]);
 						}else if(tiposSegundo[camposUsadosSegundo[i]]==2){
 							char newchar1[2];
 							memcpy(newchar1,bufferSecu+offSecu[i],sizeof(char));
@@ -3007,7 +3010,7 @@ int main(int argc, char** argv){
 							out.write(reinterpret_cast<char*>(&nuevoDouble1.num),sizeof(double));
 						}else if(tiposSegundo[camposUsadosSegundo[i]]==5){
 							charfloat nuevoFloat1;
-							memcpy(nuevoFloat1.raw,buffer+offSecu[i],sizeof(float));
+							memcpy(nuevoFloat1.raw,bufferSecu+offSecu[i],sizeof(float));
 							out.write(reinterpret_cast<char*>(&nuevoFloat1.num),sizeof(float));
 						}
 					}
