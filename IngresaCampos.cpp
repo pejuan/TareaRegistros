@@ -1451,6 +1451,7 @@ int main(int argc, char** argv){
 					cin>>LlaveStr;
 					string KeyLLaveStr = LlaveStr;
 					fstream modifyRead(fileName,ios::in|ios::out|ios::binary);
+					//fstream modifyRead(fileIndexName,ios::in|ios::out|ios::binary);
 					modifyRead.seekg(offset);
 					int count = 0;
 					bool encontrado = false;
@@ -1472,6 +1473,22 @@ int main(int argc, char** argv){
 						count++;
 
 					}
+					/*while(modifyRead.good()){
+						char bufferEl[sizeof(char)*20];
+						modifyRead.read(bufferEl,sizeof(char)*20);
+						if(modifyRead.eof()){
+							break;
+						}
+						char prueba[20];
+						memcpy(prueba,bufferEl,sizeof(char)*19);
+						prueba[19] = '\0';
+						string pruebaStr = prueba;
+						if(pruebaStr == KeyLLaveStr){
+							encontrado = true;
+							break;
+						}
+						count++;
+					}*/
 					modifyRead.close();
 					if(encontrado){
 						ifstream lector(fileName, ios::in|ios::binary);
