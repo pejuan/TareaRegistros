@@ -1008,8 +1008,8 @@ int main(int argc, char** argv){
 				}
 			}
 			in.close();
-			cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por RRN"<<endl<<"2)Por Campo"<<endl
-				<<"Ingrese codigo de opcion:";
+			cout<<"Elija el metodo con el que realizara la busqueda"<<endl<<"1)Por RRN"<<endl<<"2)Por Campo"<<endl<<"3)Por Indice lineal"
+				<<endl<<"Ingrese codigo de opcion:";
 			cin>>metodo;
 			if (metodo==1){////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				ifstream busq(fileName,ios::in|ios::binary);
@@ -1238,6 +1238,102 @@ int main(int argc, char** argv){
 				}
 				busq.close();
 
+			}else if(metodo==3){
+				if(tipoLlave==1){
+					cout<<"Ingrese la cadena llave del registro que busca:";
+					char cadenakey[20];
+					cin>>cadenakey;
+					string comparadokey = cadenakey;
+					fstream lectorInd(fileIndexName,ios::in|ios::out|ios::binary);
+					char buffy[20];
+					int cnt = 0;
+					bool encontre = false;
+					int offset = 0;
+					offset += sizeof(int)*3;
+					offset += CantidadCampos*sizeof(char)*20;
+					offset += CantidadCampos*sizeof(int);
+					offset += CantidadCampos*sizeof(int);
+					while(lectorInd.good()){
+						lectorInd.read(buffy,sizeof(char)*20);
+						if(lectorInd.eof()){
+							break;
+						}else{
+							char nuevoChain[20];
+							memcpy(nuevoChain,buffy,sizeof(char)*19);
+							nuevoChain[sizeof(char)*19] = '\0';
+							string comp = nuevoChain;
+							if(nuevoChain==comparadokey){
+								encontre = true;
+								break;
+							}else{
+								cnt++;
+							}
+						}
+
+					}
+					lectorInd.close();
+					if(encontre){
+						char buffer[sizeof(char)*20];
+						offset += totalbuffer*cnt;
+						fstream finalLector(fileName,ios::in|ios::out|ios::binary);
+						finalLector.seekg(offset);
+						finalLector.read(buffer,totalbuffer);
+						for (int i = 0; i < espejoCampos.size(); i++){
+							cout<<setw(15)<<espejoCampos[i];
+						}
+						cout<<endl<<"--------------------------------------------------------------"<<endl;
+						int progress = 0;
+						for (int i = 0; i < tipocampos.size(); i++){
+							if (tipocampos[i]==1){
+								char chain[sizes[i]];
+								memcpy(chain, buffer+progress, sizes[i]-1);
+								chain[sizes[i]-1] = '\0';
+								progress += sizes[i];
+								cout<<setw(15)<<chain;
+							
+							}else if(tipocampos[i]==2){
+								char car[2];
+								memcpy(car,buffer+progress,sizeof(char));
+								progress += sizeof(char);
+								car[1] = '\0';
+								cout<<setw(15)<<car;
+						
+							}else if(tipocampos[i]==3){
+								charint elEntero;
+								int entero;
+								memcpy(elEntero.raw,buffer+progress,sizeof(int));
+								progress += sizeof(int);
+								entero = elEntero.num;
+								cout<<setw(15)<<entero;
+
+							}else if(tipocampos[i]==5){
+								charfloat elFloat;
+								float elFlotante;
+								memcpy(elFloat.raw,buffer+progress,sizeof(float));
+								progress += sizeof(float);
+								elFlotante = elFloat.num;
+								cout<<setw(15)<<elFlotante;
+						
+							}else if(tipocampos[i]==4){
+								chardouble elDouble;
+								double elDoble;
+								memcpy(elDouble.raw,buffer+progress,sizeof(double));
+								progress += sizeof(double);
+								elDoble = elDouble.num;
+								cout<<setw(15)<<elDoble;
+							}
+						}
+						cout<<endl;
+					
+					}else{
+						cout<<"Registro no encontrado"<<endl;
+					}
+
+				}else if(tipoLlave==3){
+
+				}else{
+					cout<<"Archivo no contiene llave primaria."<<endl;
+				}
 			}
 
 
@@ -1783,7 +1879,7 @@ int main(int argc, char** argv){
 			remove(fileName);
 			int result = rename("tmp.bin",fileName);
 			cout<<"Archivo compactado con éxito."<<endl;
-		}else if(opcion2 == 8){
+		}else if(opcion2 == 8){//Salir
 			break;
 
 		}else if(opcion2 == 9){//Reindexar
