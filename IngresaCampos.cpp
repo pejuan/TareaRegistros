@@ -29,6 +29,33 @@ struct IndNum{
 	int rrn;
 	int key;
 };
+struct Nodo{
+	IndNum dato;
+	Nodo* izq;
+	Nodo* der;
+};
+Nodo* getNew(IndNum data){
+	Nodo* nuevo = new Nodo();
+	nuevo->dato = data;
+	nuevo->izq = NULL;
+	nuevo->der = NULL;
+	return nuevo;
+}
+Nodo* insertar(Nodo* raiz, IndNum data){
+	if(raiz == NULL){
+		raiz = getNew(data);
+	}else if(data.key <= raiz->dato.key){
+		raiz->izq = insertar(raiz->izq, data);
+	}else{
+		raiz->der = insertar(raiz->der, data);
+	}
+	return raiz;
+}
+bool buscar(Nodo* raiz, IndNum data){
+	if(raiz == NULL){
+
+	}
+}
 void quicksort(int[],int, int, int[]);
 void sort(string[],int,int,int[]);
 void reindex(char[]);

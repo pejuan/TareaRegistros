@@ -4,8 +4,16 @@ using namespace std;
 struct Nodo{
 	
 };
-BSTree::BSTree();
-BSTree::~BSTree();
+struct Indice{
+	int dato;
+	int rrn;
+};
+BSTree::BSTree(){
+
+}
+BSTree::~BSTree(){
+	
+}
 Nodo* BSTree::crear(int);
 Nodo* BSTree::insertar(Nodo*,int);
 int BSTree::buscar(Nodo*,int);
