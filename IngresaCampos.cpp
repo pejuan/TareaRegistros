@@ -2007,7 +2007,7 @@ int main(int argc, char** argv){
 		}else if(opcion2 == 9){//Reindexar
 			listaindicesstrings.clear();
 			listaindicesINT.clear();
-			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
+			//ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
@@ -2157,10 +2157,12 @@ int main(int argc, char** argv){
 						}
 					}
 
+					fstream ofalInd("tmp.bin.index",ios::out|ios::binary);
 					ifstream inNuevo(fileName,ios::in|ios::binary);
 					inNuevo.seekg(offset);
 					if(posicionAIngresar == 0){
 						out.write(reinterpret_cast<char*>(&keykey),sizeof(int));
+						ofalInd.write(reinterpret_cast<char*>(&keykey),sizeof(int));
 						for (int i = 1; i < CantidadCampos; ++i){
 							if(tipocampos[i]==1){
 								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2226,7 +2228,9 @@ int main(int argc, char** argv){
 									progress += sizeof(int);
 									entero = elEntero.num;
 									out.write(reinterpret_cast<char*>(&entero), sizeof(int));
-
+									if(i==0){
+										ofalInd.write(reinterpret_cast<char*>(&entero),sizeof(int));
+									}
 								}else if(tipocampos[i]==5){
 									charfloat elFloat;
 									float elFlotante;
@@ -2246,6 +2250,7 @@ int main(int argc, char** argv){
 						}
 						if (i == posicionAIngresar && i != 0){
 							out.write(reinterpret_cast<char*>(&keykey),sizeof(int));
+							ofalInd.write(reinterpret_cast<char*>(&keykey),sizeof(int));
 							for (int i = 1; i < CantidadCampos; ++i){
 								if(tipocampos[i]==1){
 									cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2279,6 +2284,7 @@ int main(int argc, char** argv){
 					inNuevo.close();
 					if(posicionAIngresar == -1){
 						out.write(reinterpret_cast<char*>(&keykey),sizeof(int));
+						ofalInd.write(reinterpret_cast<char*>(&keykey),sizeof(int));
 						for (int i = 1; i < CantidadCampos; ++i){
 							if(tipocampos[i]==1){
 								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2308,12 +2314,23 @@ int main(int argc, char** argv){
 							}
 						}
 						out.close();
+						ofalInd.close();
 					}else{
 						out.close();
+						ofalInd.close();
 					}
 					remove(fileName);
 					int result = rename("tmp.bin",fileName);
-					cout<<"Registro agregado con éxito!"<<endl;
+					remove(fileIndexName);
+					int resultado = rename("tmp.bin.index",fileIndexName);
+					cout<<"Registro agregado con éxito!"<<endl<<"Desea agregar otro registro[S/N]:";
+					char respuesta;
+					cin>>respuesta;
+					if(respuesta=='s' || respuesta=='S'){
+
+					}else{
+						break;
+					}
 
 
 				}else if(tipoLlave==1){//si la llave es string
@@ -2334,9 +2351,11 @@ int main(int argc, char** argv){
 					char theKeyAlBin[20];
 					strcpy(theKeyAlBin,keykeyStr.c_str());
 					ifstream inNuevo(fileName,ios::in|ios::binary);
+					fstream ofalInd("tmp.bin.index",ios::out|ios::binary);
 					inNuevo.seekg(offset);
 					if(posicionAIngresar == 0){
 						out.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
+						ofalInd.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
 						for (int i = 1; i < CantidadCampos; ++i){
 							if(tipocampos[i]==1){
 								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2387,6 +2406,9 @@ int main(int argc, char** argv){
 									chain[sizes[i]-1] = '\0';
 									progress += sizes[i];
 									out.write(reinterpret_cast<char*>(&chain), sizeof(char)*sizes[i]);
+									if(i==0){
+										ofalInd.write(reinterpret_cast<char*>(&chain),sizeof(char)*20);
+									}
 								
 								}else if(tipocampos[i]==2){
 									char car[2];
@@ -2422,6 +2444,7 @@ int main(int argc, char** argv){
 						}
 						if (i == posicionAIngresar && i != 0){
 							out.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
+							ofalInd.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
 							for (int i = 1; i < CantidadCampos; ++i){
 								if(tipocampos[i]==1){
 									cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2455,6 +2478,7 @@ int main(int argc, char** argv){
 					inNuevo.close();
 					if(posicionAIngresar == -1){
 						out.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
+						ofalInd.write(reinterpret_cast<char*>(&theKeyAlBin),sizeof(char)*20);
 						for (int i = 1; i < CantidadCampos; ++i){
 							if(tipocampos[i]==1){
 								cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
@@ -2484,12 +2508,16 @@ int main(int argc, char** argv){
 							}
 						}
 						out.close();
+						ofalInd.close();
 					}else{
 						out.close();
+						ofalInd.close();
 					}
 
 					remove(fileName);
+					remove(fileIndexName);
 					int result = rename("tmp.bin",fileName);
+					int resultado = rename("tmp.bin.index",fileIndexName);
 					cout<<"Registro agregado con éxito!"<<endl<<"Desea agregar un nuevo registro[S/N]:";
 					char respuesta;
 					cin>>respuesta;
@@ -3282,7 +3310,8 @@ void reindex(char fileName[20]){
 			int numerito, numerote;
 			numerito = rrnArray[i];
 			numerote = keysArray[i];
-			out.write(reinterpret_cast<char*>(&numerito),sizeof(int));
+			//out.write(reinterpret_cast<char*>(&numerito),sizeof(int));
+			out.write(reinterpret_cast<char*>(&numerote),sizeof(int));
 		}
 		out.close();
 		ifstream in2(fileName,ios::in|ios::binary);
