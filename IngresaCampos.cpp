@@ -51,9 +51,15 @@ Nodo* insertar(Nodo* raiz, IndNum data){
 	}
 	return raiz;
 }
-bool buscar(Nodo* raiz, IndNum data){
+int buscar(Nodo* raiz, IndNum data){
 	if(raiz == NULL){
-
+		return -1;
+	}else if(raiz->dato.key == data.key){
+		return raiz->dato.rrn;
+	}else if(data.key <= raiz->dato.key){
+		return buscar(raiz->izq,data);
+	}else{
+		return buscar(raiz->der,data);
 	}
 }
 void quicksort(int[],int, int, int[]);
