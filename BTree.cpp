@@ -9,8 +9,13 @@ struct NodeInts{
 
 	int buscarLlave(int llave){
 		int retval = 0;
-		while(retval<numero_llaves && llave > data[a]){
-			retval++;
+		while(true){
+			if(retval<numero_llaves && llave > data[a]){
+				retval++;
+			}else{
+				break;
+			}
+			
 		}
 		return retval;
 	}
