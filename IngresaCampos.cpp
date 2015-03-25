@@ -896,6 +896,9 @@ int main(int argc, char** argv){
 						offset += CantidadCampos*sizeof(int);
 						offset += totalbuffer*count;
 						fstream eliminador(fileName,ios::out|ios::in|ios::binary);
+						fstream elimIndex(fileIndexName, ios::out|ios::in|ios::binary);
+						elimIndex.seekp(count*sizeof(char)*20);
+						elimIndex.write(reinterpret_cast<char*>(&mark),sizeof(char));
 						eliminador.seekp(offset);
 						eliminador.write(reinterpret_cast<char*>(&mark),sizeof(char));
 						eliminador.write(reinterpret_cast<char*>(&lastAvail.num),sizeof(int));
@@ -947,6 +950,9 @@ int main(int argc, char** argv){
 						offset += CantidadCampos*sizeof(int);
 						offset += totalbuffer*count;
 						fstream eliminador(fileName,ios::out|ios::in|ios::binary);
+						fstream elimIndex(fileIndexName, ios::out|ios::in|ios::binary);
+						elimIndex.seekp(count*sizeof(char)*20);
+						elimIndex.write(reinterpret_cast<char*>(&mark),sizeof(char));
 						eliminador.seekp(offset);
 						eliminador.write(reinterpret_cast<char*>(&mark),sizeof(char));
 						eliminador.write(reinterpret_cast<char*>(&lastAvail.num),sizeof(int));
