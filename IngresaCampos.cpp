@@ -51,12 +51,12 @@ Nodo* insertar(Nodo* raiz, IndNum data){
 	}
 	return raiz;
 }
-int buscar(Nodo* raiz, IndNum data){
+int buscar(Nodo* raiz, int data){
 	if(raiz == NULL){
 		return -1;
-	}else if(raiz->dato.key == data.key){
+	}else if(raiz->dato.key == data){
 		return raiz->dato.rrn;
-	}else if(data.key <= raiz->dato.key){
+	}else if(data <= raiz->dato.key){
 		return buscar(raiz->izq,data);
 	}else{
 		return buscar(raiz->der,data);
@@ -109,9 +109,9 @@ int main(int argc, char** argv){
 		cout<<"0)Abrir archivo"<<endl<<"1)Crear nuevo archivo"<<endl<<"2)Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
 			<<"9)Reindexar"<<endl<<"10)Agregar nuevo registro (índice)"<<endl<<"11)Cruzar archivos"
-			<<endl<<"Ingrese el codigo de lo que desea hacer:";
+			<<endl<<"12)Crear archivo con árbol"<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
-		if (opcion2==1){
+		if (opcion2==1){//crear nuevo archivo
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
 			cin>>fileName;
 			stringstream archive;
@@ -125,12 +125,12 @@ int main(int argc, char** argv){
 			CantidadCampos++;
 			ofstream out(fileName, ios::out|ios::binary);
 			int avail = -1;
-			AvailList.push_back(avail);
-			 
+			AvailList.push_back(avail);	 
 			int contador = 0;
 			IndString keyStr;
 			IndNum keyNum;
-			cout<<"---------------------"<<endl<<"1)String"<<endl<<"2)Integer"<<endl<<"0)Sin Llave"<<endl<<"Ingrese de que tipo sera su Llave primaria:";
+			cout<<"---------------------"<<endl<<"1)String"<<endl<<"2)Integer"<<endl<<"3)Sin Llave"
+				<<endl<<"Ingrese de que tipo sera su Llave primaria:";
 			cin>>tipoLlave;
 			if(tipoLlave==1){
 				out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
@@ -167,7 +167,7 @@ int main(int argc, char** argv){
 			int finish;
 			if(tipoLlave==1 || tipoLlave==3){
 				finish = CantidadCampos-1;
-			}else{
+			}else if(tipoLlave==0){
 				finish = CantidadCampos;
 			}
 			while(true){
@@ -3189,7 +3189,161 @@ int main(int argc, char** argv){
 
 
 
-		}//end cruzar
+		}else if(opcion2==12){
+			tipocampos.clear();
+			nombrecampos.clear();
+			AvailList.clear();
+			sizes.clear();
+			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
+			char file[20];
+			cin>>file;
+			stringstream archive;
+			stringstream archiveind;
+			archive<<file<<".pej";
+			archive>>file;
+			cout<<"Ingrese cuantos campos tendra su estructura sin contar la llave: ";
+			cin>>CantidadCampos;
+			CantidadCampos++;
+			ofstream out(file, ios::out|ios::binary);
+			int avail = -1;
+			AvailList.push_back(avail);	 
+			int contador = 0;
+			IndNum keyNum;
+			out.write(reinterpret_cast<char*>(&CantidadCampos), sizeof(int)); //Guarda la cantidad de campos en el archivo binario
+			out.write(reinterpret_cast<char*>(&avail), sizeof(int));//Guarda el primer elemento de avail list
+			tipoLlave = 3;
+			tipocampos.push_back(3);
+			cout<<"Ingrese el nombre de su llave de tipo Integer:";
+			cin>>namekey;
+			namekeyespejo = namekey;
+			nombrecampos.push_back(namekey);
+			espejoCampos.push_back(namekey);
+			out.write(reinterpret_cast<char*>(&tipoLlave),sizeof(int));
+			out.write(reinterpret_cast<char*>(&namekey),sizeof(char)*20);
+			sizes.push_back(sizeof(int));
+			for (int i = 1; i < CantidadCampos; i++){
+				cout<<"1)String"<<endl<<"2)Integer"<<endl<<"Ingrese el tipo del siguiente campo:";
+				int type;
+				cin>>type;
+				
+				if(type==1){
+					sizes.push_back(sizeof(char)*20);
+					tipocampos.push_back(type);
+				}else{
+					sizes.push_back(sizeof(int));
+					type = 3;
+					tipocampos.push_back(type);
+				}
+				cout<<"Ingrese el nombre del campo:";
+				char namey[20];
+				cin>>namey;
+				out.write(reinterpret_cast<char*>(&namey), sizeof(char)*20);
+				nombrecampos.push_back(namey);
+				espejoCampos.push_back(namey);
+			}
+			for (int i = 0; i < tipocampos.size(); i++){
+				out.write(reinterpret_cast<char*>(&tipocampos[i]), sizeof(int));
+			}	
+
+			for (int i = 0; i < sizes.size(); i++){
+				out.write(reinterpret_cast<char*>(&sizes[i]), sizeof(int));
+			}
+			int elRRN = 0;
+			Nodo* root = NULL;
+			while(true){
+
+				for (int i = 0; i < tipocampos.size(); i++){
+					if(tipocampos[i]==1){
+						cout<<"Ingrese la cadena perteneciente al campo "<<espejoCampos[i]<<":";
+						char theChain[20];
+						cin>>theChain;
+						out.write(reinterpret_cast<char*>(&theChain),sizeof(char)*20);
+					}else if(tipocampos[i]==3){
+						cout<<"Ingrese el entero perteneciente al campo "<<espejoCampos[i]<<":";
+						int theInt;
+						cin>>theInt;
+						out.write(reinterpret_cast<char*>(&theInt),sizeof(int));
+						if(i == 0){
+							IndNum indice;
+							indice.key = theInt;
+							indice.rrn = elRRN;
+							root = insertar(root,indice);
+						}
+
+					}
+				}
+
+
+				elRRN++;
+				cout<<"Desea agregar más registros? [S/N]:";
+				char seguir;
+				cin>>seguir;
+				if(seguir=='n' || seguir=='N'){
+					cout<<"Creado arbol con éxito."<<endl;
+					out.close();
+					break;
+				}
+
+			}
+			int totalfija = 0;
+			for (int i = 0; i < sizes.size(); i++){
+				totalfija += sizes[i];
+			}
+			
+
+			while(true){
+				int offset = 0;
+				offset += sizeof(int)*3;
+				offset += CantidadCampos*sizeof(char)*20;
+				offset += CantidadCampos*sizeof(int);
+				offset += CantidadCampos*sizeof(int);
+				cout<<"Ingrese la llave que buscara: ";
+				int buscada;
+				cin>>buscada;
+				int RRN = buscar(root,buscada);
+				if(RRN == -1){
+					cout<<"Registro no encontrado"<<endl;
+				}else{
+					offset += totalfija*RRN;
+					cout<<"--------------------------------------------------------------------------------------------------------"<<endl;
+					for (int i = 0; i < espejoCampos.size(); i++){
+						cout<<setw(20)<<espejoCampos[i];
+					}
+					cout<<endl;
+					char buffer[totalfija];
+					fstream lector(file, ios::in|ios::out|ios::binary);
+					lector.seekg(offset);
+					lector.read(buffer,totalfija);
+					int acumulador = 0;
+					for (int i = 0; i < tipocampos.size(); i++){
+						if(tipocampos[i]==1){
+							char str[20];
+							memcpy(str,buffer+acumulador,sizeof(char)*19);
+							str[19] = '\0';
+							string mirror = str;
+							cout<<setw(20)<<mirror;
+							acumulador += sizeof(char)*20;
+						}else if(tipocampos[i]==3){
+							charint Num;
+							memcpy(Num.raw,buffer+acumulador,sizeof(int));
+							cout<<setw(20)<<Num.num;
+							acumulador += sizeof(int);
+						}
+					}
+					lector.close();
+				}
+				cout<<endl<<"--------------------------------------------------------------------------------------------------------"<<endl;
+				cout<<endl<<"Desea hacer otra busqueda? [S/N]: ";
+				char querer;
+				cin>>querer;
+				if(querer=='n' || querer=='N'){
+					break;
+				}
+			}
+
+
+
+		}
 
 
 	}//end while
