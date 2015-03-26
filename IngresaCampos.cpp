@@ -3189,7 +3189,7 @@ int main(int argc, char** argv){
 
 
 
-		}else if(opcion2==12){
+		}else if(opcion2==12){//archivo con árbol
 			tipocampos.clear();
 			nombrecampos.clear();
 			AvailList.clear();
@@ -3250,6 +3250,7 @@ int main(int argc, char** argv){
 			}
 			int elRRN = 0;
 			Nodo* root = NULL;
+			cout<<"Ingrese los registros:"<<endl;
 			while(true){
 
 				for (int i = 0; i < tipocampos.size(); i++){
