@@ -106,9 +106,10 @@ int main(int argc, char** argv){
 		int tipoLlave;
 		cout<<"------------------------------------------------------------------------------------------------------------"<<endl
 			<<endl;
-		cout<<"0)Abrir archivo"<<endl<<"1)Ingresar nuevo"<<endl<<"2)Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
+		cout<<"0)Abrir archivo"<<endl<<"1)Crear nuevo archivo"<<endl<<"2)Listar"<<endl<<"3)Agregar nuevo registro"<<endl<<"4)Borrar registro"<<endl
 			<<"5)Buscar registro"<<endl<<"6)Modificar"<<endl<<"7)Compactar"<<endl<<"8)Salir"<<endl
-			<<"9)Reindexar"<<endl<<"10)Agregar con índice"<<endl<<"11)Cruzar archivos"<<endl<<"Ingrese el codigo de lo que desea hacer:";
+			<<"9)Reindexar"<<endl<<"10)Agregar nuevo registro (índice)"<<endl<<"11)Cruzar archivos"
+			<<endl<<"Ingrese el codigo de lo que desea hacer:";
 		cin>>opcion2;
 		if (opcion2==1){
 			cout<<"Ingrese el nombre del archivo con el que realizara la accion:";
@@ -336,7 +337,7 @@ int main(int argc, char** argv){
 					break;
 				}
 				
-			}
+			}//Crear nuevo
 		}else if(opcion2==2){ //Leer
 
 			ifstream in(fileName, ios::in|ios::binary); //cambiar de vuelta a registro.bin
