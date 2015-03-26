@@ -837,6 +837,17 @@ int main(int argc, char** argv){
 				int tmpnum = tmp.num;
 				checker.close();
 				fstream er(fileName, ios::out|ios::in|ios::binary);	
+				if(tipoLlave==1){
+					fstream elimIndex(fileIndexName, ios::out|ios::in|ios::binary);
+					elimIndex.seekp(indiceBorrado*sizeof(char)*20);
+					elimIndex.write(reinterpret_cast<char*>(&mark),sizeof(char));
+					elimIndex.close();
+				}else if(tipoLlave==3){
+					fstream elimIndex(fileIndexName, ios::out|ios::in|ios::binary);
+					elimIndex.seekp(indiceBorrado*sizeof(int));
+					elimIndex.write(reinterpret_cast<char*>(&mark),sizeof(char));
+					elimIndex.close();
+				}
 				er.seekp(offset);				
 				er.write(reinterpret_cast<char*>(&mark),sizeof(char));
 				er.write(reinterpret_cast<char*>(&tmpnum),sizeof(int));
@@ -951,7 +962,7 @@ int main(int argc, char** argv){
 						offset += totalbuffer*count;
 						fstream eliminador(fileName,ios::out|ios::in|ios::binary);
 						fstream elimIndex(fileIndexName, ios::out|ios::in|ios::binary);
-						elimIndex.seekp(count*sizeof(char)*20);
+						elimIndex.seekp(count*sizeof(int));
 						elimIndex.write(reinterpret_cast<char*>(&mark),sizeof(char));
 						eliminador.seekp(offset);
 						eliminador.write(reinterpret_cast<char*>(&mark),sizeof(char));
@@ -2002,10 +2013,47 @@ int main(int argc, char** argv){
 					}
 				}
 			}
+			int lectura = 0;
+			if(tipoLlave==1){
+				lectura = sizeof(char)*20;
+			}else if(tipoLlave==3){
+				lectura = sizeof(int);
+			}
+			if(tipoLlave==1 || tipoLlave==3){
+				ifstream inner(fileIndexName, ios::in|ios::binary);
+				fstream outer("tmp.bin.index", ios::out|ios::binary);
+				char Raw[lectura];
+				while(inner.good()){
+					inner.read(Raw,lectura);
+					if(inner.eof()){
+						break;
+					}
+					char veri[2];
+					memcpy(veri,Raw,sizeof(char));
+					veri[1] = '\0';
+					if (veri[0]=='*'){
+						
+					}else{
+						if(tipoLlave==1){
+							outer.write(reinterpret_cast<char*>(&Raw),lectura);
+						}else if(tipoLlave==3){
+							charint elraw;
+							memcpy(elraw.raw,Raw,sizeof(int));
+							outer.write(reinterpret_cast<char*>(&elraw.num),sizeof(int));
+						}
+					}
+
+				}
+				inner.close();
+				outer.close();
+				remove(fileIndexName);
+				int resultado = rename("tmp.bin.index",fileIndexName);
+			}
 			in.close();
 			out.close();
 			remove(fileName);
 			int result = rename("tmp.bin",fileName);
+
 			cout<<"Archivo compactado con éxito."<<endl;
 		}else if(opcion2 == 8){//Salir
 			break;
